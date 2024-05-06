@@ -1,0 +1,7 @@
+<level>
+    <hasThreeLayers>false</hasThreeLayers>
+    <isHardLevel>false</isHardLevel>
+    <texture1>../Resources/Blocks/0-2.png</texture1>
+    <texture2>../Resources/Blocks/0-1.png</texture2>
+    <texture3></texture3>
+<level>

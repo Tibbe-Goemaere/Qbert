@@ -1,0 +1,194 @@
+#include <string>
+#include "GameObject.h"
+#include "ResourceManager.h"
+#include "Renderer.h"
+#include "BaseComponent.h"
+#include <memory>
+#include "Scene.h"
+
+dae::GameObject::GameObject()
+	:m_renderLayer{0}
+{
+
+}
+
+void dae::GameObject::Update()
+{
+	for (const auto& comp : m_pComponents)
+	{
+		const auto component = comp.get();
+		if (component)
+		{
+			component->Update();
+		}
+	}
+}
+
+void dae::GameObject::LateUpdate()
+{
+	for (const auto& comp : m_pComponents)
+	{
+		const auto component = comp.get();
+		if (component)
+		{
+			component->LateUpdate();
+		}
+	}
+}
+
+void dae::GameObject::Render() const
+{
+	for (const auto& comp : m_pComponents)
+	{
+		const auto component = comp.get();
+		if (component)
+		{
+			component->Render();
+		}
+	}
+}
+
+bool dae::GameObject::MarkedForDestroy() const
+{
+	return m_MarkedForDestroy;
+}
+
+void dae::GameObject::SetParent(GameObject* pParent, bool keepWorldPos)
+{
+	if (pParent == this || pParent == m_pParent)
+	{
+		return;
+	}
+	if (std::find_if(m_pChildren.begin(), m_pChildren.end(), [&](const std::unique_ptr<GameObject>& ptr) 
+		{ return ptr.get() == pParent; }) != m_pChildren.end())
+	{
+		return;
+	}
+
+	if (pParent == nullptr)
+	{
+		SetLocalPosition(GetWorldPosition());
+		m_pParent = nullptr;
+	}
+	else
+	{
+		if (keepWorldPos)
+		{
+			SetLocalPosition(GetLocalPosition() - m_pParent->GetWorldPosition());
+		}
+
+		if (m_pParent)
+		{
+			m_pParent->RemoveChild(this);
+		}
+
+		m_pParent = pParent;
+		//m_pParent->AddChild(this);
+	}
+
+	SetPositionDirty();
+}
+
+dae::GameObject* dae::GameObject::GetParent() const
+{
+	return m_pParent;
+}
+
+dae::GameObject* dae::GameObject::GetChildAt(int idx) const
+{
+	return m_pChildren[idx].get();
+}
+
+int dae::GameObject::GetChildCount() const
+{
+	return static_cast<int>(m_pChildren.size());
+}
+
+void dae::GameObject::AddChild(GameObject* pChild)
+{
+	m_pChildren.emplace_back(m_pScene->GetObject(pChild));
+}
+
+void dae::GameObject::RemoveChild(GameObject* pChild)
+{
+	m_pChildren.erase(std::remove_if(m_pChildren.begin(), m_pChildren.end(),
+		[&](const std::unique_ptr<GameObject>& ptr) { return ptr.get() == pChild; }),
+		m_pChildren.end());
+}
+
+const glm::vec3& dae::GameObject::GetWorldPosition()
+{
+	if (m_positionIsDirty)
+	{
+		UpdateWorldPosition();
+	}
+	return m_worldPosition;
+}
+
+void dae::GameObject::SetWorldPosition(const glm::vec3& pos)
+{
+	m_worldPosition.x = pos.x;
+	m_worldPosition.y = pos.y;
+	m_worldPosition.z = pos.z;
+	SetPositionDirty();
+}
+
+const glm::vec3& dae::GameObject::GetLocalPosition()
+{
+	if (m_positionIsDirty)
+	{
+		UpdateWorldPosition();
+	}
+	return m_localPosition;
+}
+
+void dae::GameObject::SetLocalPosition(const glm::vec3& pos)
+{
+	m_localPosition.x = pos.x;
+	m_localPosition.y = pos.y;
+	m_localPosition.z = pos.z;
+	SetPositionDirty();
+}
+
+void dae::GameObject::SetScene(Scene* pScene)
+{
+	m_pScene = pScene;
+}
+
+void dae::GameObject::SetRenderLayer(int layer)
+{
+	//change this layer, if it is higher it gets rendered above other textures, all textures default to zero
+	m_renderLayer = layer;
+	//sort the gameobjects so the priority if okay
+	m_pScene->SortObjectsRenderPriority();
+}
+
+int dae::GameObject::GetRenderLayer() const
+{
+	return m_renderLayer;
+}
+
+void dae::GameObject::UpdateWorldPosition()
+{
+	if (m_positionIsDirty)
+	{
+		if (m_pParent == nullptr)
+		{
+			m_worldPosition = m_localPosition;
+		}
+		else
+		{
+			m_worldPosition = m_pParent->GetWorldPosition() + m_localPosition;
+		}
+		m_positionIsDirty = false;
+	}
+}
+
+void dae::GameObject::SetPositionDirty()
+{
+	m_positionIsDirty = true;
+	for (int i{ 0 }; i < static_cast<int>(m_pChildren.size()); ++i)
+	{
+		m_pChildren[i]->m_positionIsDirty = true;
+	}
+}

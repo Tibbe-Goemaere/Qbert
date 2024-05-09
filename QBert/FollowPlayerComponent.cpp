@@ -7,26 +7,18 @@
 #include <cstdlib>
 
 dae::FollowPlayerComponent::FollowPlayerComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed, float waitTime)
-	:BaseComponent::BaseComponent(pParent)
-	, m_speed{ speed }
+	:MoveComponent::MoveComponent(pParent,pLevel,speed)
 	, m_timer{ 0 }
 	, m_waitTime{ waitTime }
-{
-	auto pMoveComp = pParent->GetComponent<MoveComponent>();
-	if (pMoveComp == nullptr)
-	{
-		pMoveComp = pParent->AddComponent<MoveComponent>(pLevel, speed);
-	}
-	m_pMoveComponent = pMoveComp;
-}
+{}
 
 void dae::FollowPlayerComponent::Update()
 {
-	BaseComponent::Update();
+	MoveComponent::Update();
 
 	bool moveLeft = false;
 
-	switch (m_pMoveComponent->GetCurrentState())
+	switch (m_currentState)
 	{
 	case dae::MovementState::Idle:
 		m_timer += TimeManager::GetInstance().GetDeltaTime();
@@ -36,14 +28,14 @@ void dae::FollowPlayerComponent::Update()
 		}
 		m_timer = 0;
 
-		if (m_pMoveComponent->GetCurrentBlock().row == (m_pMoveComponent->GetLevel()->GetAmountOfLayers() - 1))
+		if (m_pCurrentBlock->row == (m_pLevel->GetAmountOfLayers() - 1))
 		{
 			m_timer = m_waitTime;
 		}
 
-		if (m_pMoveComponent->CheckDeath())
+		if (CheckDeath())
 		{
-			m_pMoveComponent->Fall();
+			Fall();
 		}
 
 
@@ -51,11 +43,11 @@ void dae::FollowPlayerComponent::Update()
 
 		if (moveLeft)
 		{
-			m_pMoveComponent->Move(dae::Direction::BottomLeft);
+			Move(FindNextBlock());
 		}
 		else
 		{
-			m_pMoveComponent->Move(dae::Direction::BottomRight);
+			Move(dae::Direction::BottomRight);
 		}
 		break;
 	case dae::MovementState::Moving:
@@ -65,6 +57,12 @@ void dae::FollowPlayerComponent::Update()
 	default:
 		break;
 	}
+}
+
+dae::Direction dae::FollowPlayerComponent::FindNextBlock()
+{
+	//m_pLevel.
+	return dae::Direction();
 }
 
 

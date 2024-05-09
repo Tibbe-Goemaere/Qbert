@@ -13,10 +13,10 @@ namespace dae
 		Falling
 	};
 
-	class MoveComponent final : public BaseComponent
+	class MoveComponent : public BaseComponent
 	{
 	public:
-		void Update() override;
+		virtual void Update() override;
 
 		MoveComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed = 150.f);
 		virtual ~MoveComponent() = default;
@@ -25,17 +25,17 @@ namespace dae
 		MoveComponent& operator=(const MoveComponent& other) = delete;
 		MoveComponent& operator=(MoveComponent&& other) = delete;
 
-		void Move(const dae::Direction& direction);
+	protected:
+		bool Move(const dae::Direction& direction);
 		bool CheckDeath();
 		void Fall();
-		MovementState GetCurrentState() const;
-		dae::Block GetCurrentBlock() const;
-		dae::LevelComponent* GetLevel() const;
-	private:
+
 		dae::LevelComponent* m_pLevel;
-		float m_blockSize;
-		dae::Block m_currentBlock;
+		dae::Block* m_pCurrentBlock;
 		MovementState m_currentState;
+
+	private:
+		float m_blockSize;
 		glm::vec3 m_targetPosition;
 		float m_speed;
 	};

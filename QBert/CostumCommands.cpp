@@ -11,5 +11,5 @@ dae::MovePlayerCommand::MovePlayerCommand(dae::GameObject* pObject, const dae::D
 
 void dae::MovePlayerCommand::Execute()
 {
-	m_pPlayerMovement->Move(m_direction);
+	m_pPlayerMovement->MovePlayer(m_direction);
 }

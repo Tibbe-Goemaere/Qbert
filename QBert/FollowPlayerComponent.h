@@ -1,12 +1,12 @@
 #pragma once
-#include "BaseComponent.h"
+#include "MoveComponent.h"
 
 namespace dae
 {
-	class MoveComponent;
 	class LevelComponent;
+	enum class Direction;
 
-	class FollowPlayerComponent final : public BaseComponent
+	class FollowPlayerComponent final : public MoveComponent
 	{
 	public:
 		void Update() override;
@@ -18,9 +18,9 @@ namespace dae
 		FollowPlayerComponent& operator=(const FollowPlayerComponent& other) = delete;
 		FollowPlayerComponent& operator=(FollowPlayerComponent&& other) = delete;
 	private:
-		dae::MoveComponent* m_pMoveComponent;
-		const float m_speed;
 		float m_timer;
 		const float m_waitTime;
+
+		dae::Direction FindNextBlock();
 	};
 }

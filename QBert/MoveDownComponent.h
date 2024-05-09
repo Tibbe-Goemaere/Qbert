@@ -1,12 +1,11 @@
 #pragma once
-#include "BaseComponent.h"
+#include "MoveComponent.h"
 
 namespace dae
 {
-	class MoveComponent;
 	class LevelComponent;
 
-	class MoveDownComponent final : public BaseComponent
+	class MoveDownComponent final : public MoveComponent
 	{
 	public:
 		void Update() override;
@@ -18,8 +17,6 @@ namespace dae
 		MoveDownComponent& operator=(const MoveDownComponent& other) = delete;
 		MoveDownComponent& operator=(MoveDownComponent&& other) = delete;
 	private:
-		dae::MoveComponent* m_pMoveComponent;
-		const float m_speed;
 		const bool m_canTransform;
 		float m_timer;
 		const float m_waitTime;

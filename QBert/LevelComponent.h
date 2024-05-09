@@ -18,6 +18,14 @@ namespace dae
 		std::string intermediateBlock = "";
 	};
 
+	enum class EntityType
+	{
+		None,
+		Player,
+		GreenEnemy,
+		PurpleEnemy
+	};
+
 	struct Block
 	{
 		int row;
@@ -25,6 +33,12 @@ namespace dae
 		glm::vec2 pos;
 		int textureIndex;
 		int idx;
+	};
+
+	struct Entity
+	{
+		int blockIdx;
+		EntityType entityType = EntityType::None;
 	};
 
 	class LevelComponent final : public BaseComponent
@@ -39,23 +53,25 @@ namespace dae
 		LevelComponent& operator=(const LevelComponent& other) = delete;
 		LevelComponent& operator=(LevelComponent&& other) = delete;
 
-		std::vector<Block> GetBlocks() const;
-		Block GetBlock(const int row, const int column);
+		//std::vector<Block*> GetBlocks() const;
+		Block* GetBlock(const int row, const int column);
 		dae::GameObject* GetParent() const;
 		float GetBlockSize() const;
 		bool ChangeBlock(int idx, int textureIdx);
 		int GetAmountOfLayers() const;
+		void AddEntity(std::unique_ptr<Entity> pNewEntity);
 
 	private:
-		std::vector<Block> m_blocks;
+		std::vector<std::unique_ptr<Block>> m_pBlocks;
 		std::vector<std::string> m_texturePaths;
 		dae::RenderComponent* m_pRenderComponent;
 		XmlLevelInfo m_levelInfo;
 		int m_amountOfLayers;
 		int m_amountOfSteps;
+		std::vector<std::unique_ptr<Entity>> m_pEntities;
 
 		void SetTextures();
-		std::vector<dae::Block> LoadLevel(const std::string& filename);
+		void LoadLevel(const std::string& filename);
 		void WriteLevel(const std::string& filename, XmlLevelInfo info);
 	};
 

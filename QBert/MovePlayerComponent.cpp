@@ -6,38 +6,34 @@
 #include "HealthComponent.h"
 #include "ScoreComponent.h"
 
-dae::MovePlayerComponent::MovePlayerComponent(dae::GameObject* pParent, LevelComponent* pLevel)
-	:BaseComponent::BaseComponent(pParent)
-	, m_pScoreComponent{ pParent->GetComponent<ScoreComponent>() }
-	, m_pHealthComponent{ pParent->GetComponent<HealthComponent>() }
+dae::MovePlayerComponent::MovePlayerComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed)
+	:MoveComponent::MoveComponent(pParent,pLevel,speed)
+	,m_pScoreComponent{ pParent->GetComponent<ScoreComponent>() }
+	,m_pHealthComponent{ pParent->GetComponent<HealthComponent>() }
 	,m_hasMoved{false}
 {
-	auto pMoveComp = pParent->GetComponent<MoveComponent>();
-	if (pMoveComp == nullptr)
-	{
-		pMoveComp = pParent->AddComponent<MoveComponent>(pLevel);
-	}
-	m_pMoveComponent = pMoveComp;
+	//pLevel->AddEntity(std::make_unique<Entity>(pMoveComp->GetCurrentBlock()->idx,EntityType::Player));
 }
 
-void dae::MovePlayerComponent::Move(const dae::Direction& direction)
+void dae::MovePlayerComponent::MovePlayer(const dae::Direction& direction)
 {
-	m_pMoveComponent->Move(direction);
-
-	auto& ss = SoundLocater::GetSoundsystem();
-	ss.Play("../Resources/Sounds/JumpSound.wav", 1);
+	if (Move(direction))
+	{
+		auto& ss = SoundLocater::GetSoundsystem();
+		ss.Play("../Resources/Sounds/JumpSound.wav", 1);
+	}
 }
 
 void dae::MovePlayerComponent::Update()
 {
-	BaseComponent::Update();
+	MoveComponent::Update();
 
-	switch (m_pMoveComponent->GetCurrentState())
+	switch (m_currentState)
 	{
 	case dae::MovementState::Idle:
 		if (m_hasMoved)
 		{
-			if (m_pMoveComponent->CheckDeath())
+			if (CheckDeath())
 			{
 				auto& ss = SoundLocater::GetSoundsystem();
 				ss.Play("../Resources/Sounds/DieSound.wav", 1);
@@ -48,10 +44,7 @@ void dae::MovePlayerComponent::Update()
 				return;
 			}
 
-			auto block = m_pMoveComponent->GetCurrentBlock();
-			auto pLevel = m_pMoveComponent->GetLevel();
-
-			if (pLevel->ChangeBlock(block.idx, block.textureIndex) && m_pScoreComponent)
+			if (m_pLevel->ChangeBlock(m_pCurrentBlock->idx, m_pCurrentBlock->textureIndex) && m_pScoreComponent)
 			{
 				const int colorChangePoints = 25;
 				m_pScoreComponent->AddScore(colorChangePoints);

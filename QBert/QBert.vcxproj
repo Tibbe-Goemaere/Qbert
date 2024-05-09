@@ -175,6 +175,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_mixer\lib\$(PlatformTarget)\*.dll" "$(OutputP
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CoilyComponent.cpp" />
     <ClCompile Include="CostumCommands.cpp" />
     <ClCompile Include="FollowPlayerComponent.cpp" />
     <ClCompile Include="LevelComponent.cpp" />
@@ -185,6 +186,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_mixer\lib\$(PlatformTarget)\*.dll" "$(OutputP
     <ClCompile Include="CostumGameObjects.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CoilyComponent.h" />
     <ClInclude Include="CostumCommands.h" />
     <ClInclude Include="FollowPlayerComponent.h" />
     <ClInclude Include="LevelComponent.h" />

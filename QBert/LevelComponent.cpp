@@ -11,7 +11,7 @@ dae::LevelComponent::LevelComponent(dae::GameObject* pParent, const std::string&
 	,m_amountOfSteps{7}
 {
 	//WriteLevel("Level1-0.xml", XmlLevelInfo{ false,false,"../Resources/Blocks/0-2.png", "../Resources/Blocks/0-1.png"});
-	m_blocks = LoadLevel(levelPath);
+	LoadLevel(levelPath);
 	SetTextures();
 }
 
@@ -20,24 +20,19 @@ dae::LevelComponent::~LevelComponent()
 
 }
 
-std::vector<dae::Block> dae::LevelComponent::GetBlocks() const
+dae::Block* dae::LevelComponent::GetBlock(const int row, const int column)
 {
-	return m_blocks;
-}
+	auto blockIt = std::find_if(m_pBlocks.begin(), m_pBlocks.end(), [column, row](const std::unique_ptr<Block>& block) 
+		{return block->column == column && block->row == row; });
 
-dae::Block dae::LevelComponent::GetBlock(const int row, const int column)
-{
-	auto blockIt = std::find_if(m_blocks.begin(), m_blocks.end(), [column, row](const Block& block) 
-		{return block.column == column && block.row == row; });
-
-	if (blockIt != m_blocks.end()) 
+	if (blockIt != m_pBlocks.end()) 
 	{
-		return *blockIt;
+		return blockIt->get();
 	}
 	else 
 	{
-		// If block is not found, return a Block with row -1, to indicate void
-		return Block{-1};
+		// If block is not found, return null
+		return nullptr;
 	}
 }
 
@@ -53,11 +48,11 @@ float dae::LevelComponent::GetBlockSize() const
 
 bool dae::LevelComponent::ChangeBlock(int idx, int textureIdx)
 {
-	const int amountOfBlocks = static_cast<int>(m_blocks.size());
+	const int amountOfBlocks = static_cast<int>(m_pBlocks.size());
 	//Check if were not on the final layer
 	if (textureIdx < (m_amountOfLayers - 1))
 	{
-		m_blocks[idx].textureIndex += 1;
+		m_pBlocks[idx]->textureIndex += 1;
 		m_pRenderComponent->SetRenderTexture(false, idx + (textureIdx * amountOfBlocks));
 		m_pRenderComponent->SetRenderTexture(true, idx + ((textureIdx + 1) * amountOfBlocks));
 		return true;
@@ -70,6 +65,11 @@ int dae::LevelComponent::GetAmountOfLayers() const
 	return m_amountOfSteps;
 }
 
+void dae::LevelComponent::AddEntity(std::unique_ptr<Entity> pNewEntity)
+{
+	m_pEntities.push_back(std::move(pNewEntity));
+}
+
 void dae::LevelComponent::Update()
 {
 	BaseComponent::Update();
@@ -80,22 +80,20 @@ void dae::LevelComponent::SetTextures()
 	for (int i = 0; i < m_amountOfLayers; i++)
 	{
 		//Add all the textures in my render component for all possible blocks, only the first layer will display
-		for (const auto& block : m_blocks)
+		for (const auto& block : m_pBlocks)
 		{
-			m_pRenderComponent->SetTexture(m_texturePaths[i], i == 0, block.pos);
+			m_pRenderComponent->SetTexture(m_texturePaths[i], i == 0, block->pos);
 		}
 	}
 }
 
-std::vector<dae::Block> dae::LevelComponent::LoadLevel(const std::string& filename)
+void dae::LevelComponent::LoadLevel(const std::string& filename)
 {
-	std::vector<dae::Block> blocks;
-
 	std::ifstream file(filename);
 	if (!file.is_open()) 
 	{
 		std::cerr << "Error: Unable to open file for reading\n";
-		return blocks;
+		return;
 	}
 
 	std::string line;
@@ -149,13 +147,12 @@ std::vector<dae::Block> dae::LevelComponent::LoadLevel(const std::string& filena
 				pos = pos + glm::vec2(-widthBetween / 2.f, widthBetween * 3.f / 4.f);
 			}
 			auto newPos = pos + glm::vec2(col * widthBetween, 0);
-			blocks.push_back(Block{ row,col,newPos,0, idx});
+			auto pBlock = std::make_unique<Block>(Block{ row, col, newPos, 0, idx });
+			m_pBlocks.push_back(std::move(pBlock));
 			++idx;
 		}
 		++columns;
 	}
-
-	return blocks;
 }
 
 void dae::LevelComponent::WriteLevel(const std::string& filename, XmlLevelInfo info)

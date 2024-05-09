@@ -7,27 +7,19 @@
 #include <cstdlib>
 
 dae::MoveDownComponent::MoveDownComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed, float waitTime, bool canTransform)
-	:BaseComponent::BaseComponent(pParent)
-	,m_speed{speed}
+	:MoveComponent::MoveComponent(pParent,pLevel,speed)
 	,m_canTransform{canTransform}
 	,m_timer{0}
 	,m_waitTime{waitTime}
-{
-	auto pMoveComp = pParent->GetComponent<MoveComponent>();
-	if (pMoveComp == nullptr)
-	{
-		pMoveComp = pParent->AddComponent<MoveComponent>(pLevel,speed);
-	}
-	m_pMoveComponent = pMoveComp;
-}
+{}
 
 void dae::MoveDownComponent::Update()
 {
-	BaseComponent::Update();
+	MoveComponent::Update();
 
 	bool moveLeft = false;
 
-	switch (m_pMoveComponent->GetCurrentState())
+	switch (m_currentState)
 	{
 	case dae::MovementState::Idle:
 		m_timer += TimeManager::GetInstance().GetDeltaTime();
@@ -37,7 +29,13 @@ void dae::MoveDownComponent::Update()
 		}
 		m_timer = 0;
 
-		if (m_pMoveComponent->GetCurrentBlock().row == (m_pMoveComponent->GetLevel()->GetAmountOfLayers() - 1))
+		if (CheckDeath() && !m_canTransform)
+		{
+			Fall();
+			return;
+		}
+
+		if (m_pCurrentBlock->row == (m_pLevel->GetAmountOfLayers() - 1))
 		{
 			m_timer = m_waitTime;
 			if (m_canTransform)
@@ -46,21 +44,18 @@ void dae::MoveDownComponent::Update()
 			}
 		}
 
-		if (m_pMoveComponent->CheckDeath() && !m_canTransform)
-		{
-			m_pMoveComponent->Fall();
-		}
+		
 
 
 		moveLeft = (rand() % 2) == 0;
 
 		if (moveLeft)
 		{
-			m_pMoveComponent->Move(dae::Direction::BottomLeft);
+			Move(dae::Direction::BottomLeft);
 		}
 		else
 		{
-			m_pMoveComponent->Move(dae::Direction::BottomRight);
+			Move(dae::Direction::BottomRight);
 		}
 		break;
 	case dae::MovementState::Moving:

@@ -4,8 +4,6 @@
 
 namespace dae
 {
-	enum class Direction;
-	
 	enum class MovementState 
 	{
 		Idle,
@@ -18,7 +16,7 @@ namespace dae
 	public:
 		virtual void Update() override;
 
-		MoveComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed = 150.f);
+		MoveComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed = 150.f, int row = 0, int column = 0);
 		virtual ~MoveComponent() = default;
 		MoveComponent(const MoveComponent& other) = delete;
 		MoveComponent(MoveComponent&& other) = delete;
@@ -26,9 +24,10 @@ namespace dae
 		MoveComponent& operator=(MoveComponent&& other) = delete;
 
 	protected:
-		bool Move(const dae::Direction& direction);
+		bool Move(const glm::vec2& direction);
 		bool CheckDeath();
 		void Fall();
+		void GetNextRowColumn(int& row, int& column, const glm::vec2& dir);
 
 		dae::LevelComponent* m_pLevel;
 		dae::Block* m_pCurrentBlock;

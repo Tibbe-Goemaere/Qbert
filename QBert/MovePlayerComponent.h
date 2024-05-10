@@ -20,10 +20,11 @@ namespace dae
 		MovePlayerComponent& operator=(const MovePlayerComponent& other) = delete;
 		MovePlayerComponent& operator=(MovePlayerComponent&& other) = delete;
 
-		void MovePlayer(const dae::Direction& direction);
+		void MovePlayer(const glm::vec2& direction);
 	private:
 		dae::ScoreComponent* m_pScoreComponent;
 		dae::HealthComponent* m_pHealthComponent;
 		bool m_hasMoved;
+		int m_entityIdx;
 	};
 }

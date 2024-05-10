@@ -6,12 +6,27 @@
 #include "TimeManager.h"
 #include <cstdlib>
 
-dae::MoveDownComponent::MoveDownComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed, float waitTime, bool canTransform)
+dae::MoveDownComponent::MoveDownComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed, float waitTime)
 	:MoveComponent::MoveComponent(pParent,pLevel,speed)
-	,m_canTransform{canTransform}
 	,m_timer{0}
 	,m_waitTime{waitTime}
+	,m_isAtBottom{false}
 {}
+
+bool dae::MoveDownComponent::IsAtBottom() const
+{
+	return m_isAtBottom;
+}
+
+dae::LevelComponent* dae::MoveDownComponent::GetLevel()
+{
+	return m_pLevel;
+}
+
+dae::Block* dae::MoveDownComponent::GetCurrentBlock()
+{
+	return m_pCurrentBlock;
+}
 
 void dae::MoveDownComponent::Update()
 {
@@ -29,34 +44,32 @@ void dae::MoveDownComponent::Update()
 		}
 		m_timer = 0;
 
-		if (CheckDeath() && !m_canTransform)
+		if (CheckDeath())
 		{
 			Fall();
 			return;
 		}
 
-		if (m_pCurrentBlock->row == (m_pLevel->GetAmountOfLayers() - 1))
-		{
-			m_timer = m_waitTime;
-			if (m_canTransform)
-			{
-
-			}
-		}
-
-		
-
-
+		//Movement down pyramid
 		moveLeft = (rand() % 2) == 0;
 
 		if (moveLeft)
 		{
-			Move(dae::Direction::BottomLeft);
+			Move(glm::vec2(-1,-1));
 		}
 		else
 		{
-			Move(dae::Direction::BottomRight);
+			Move(glm::vec2(1,-1));
 		}
+
+		if (m_pCurrentBlock != nullptr)
+		{
+			if (m_pCurrentBlock->row == (m_pLevel->GetAmountOfLayers() - 1))
+			{
+				m_isAtBottom = true;
+			}
+		}
+
 		break;
 	case dae::MovementState::Moving:
 		break;

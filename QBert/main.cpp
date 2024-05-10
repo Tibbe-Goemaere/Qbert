@@ -24,6 +24,8 @@
 #include "CostumCommands.h"
 #include "SoundSystem.h"
 #include "MoveDownComponent.h"
+#include "FollowPlayerComponent.h"
+#include "CoilyComponent.h"
 
 using namespace dae;
 
@@ -82,22 +84,22 @@ void load()
 	renderCoily->SetTexture("../Resources/Sprites/CoilyEgg.png");
 
 	//Movemement
-	coily->AddComponent<dae::MoveDownComponent>(level1Component);
+	coily->AddComponent<dae::CoilyComponent>(level1Component);
 	
 	scene.Add(std::move(coily));
 
 
 	//Qbert Commands
-	auto upLeftQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, dae::Direction::TopRight);
+	auto upLeftQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(1,1));
 	dae::InputManager::GetInstance().BindCommand(SDLK_w, std::move(upLeftQbertCommand),true);
 
-	auto upRightQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, dae::Direction::Topleft);
+	auto upRightQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(-1, 1));
 	dae::InputManager::GetInstance().BindCommand(SDLK_a, std::move(upRightQbertCommand), true);
 
-	auto downLeftQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, dae::Direction::BottomLeft);
+	auto downLeftQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(-1, -1));
 	dae::InputManager::GetInstance().BindCommand(SDLK_s, std::move(downLeftQbertCommand), true);
 
-	auto downRightQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, dae::Direction::BottomRight);
+	auto downRightQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(1, -1));
 	dae::InputManager::GetInstance().BindCommand(SDLK_d, std::move(downRightQbertCommand), true);
 
 	//Add controls explanation

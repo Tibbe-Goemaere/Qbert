@@ -3,23 +3,27 @@
 #include "TimeManager.h"
 #include "CostumCommands.h"
 
-dae::MoveComponent::MoveComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed)
+dae::MoveComponent::MoveComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed, int row, int column)
 	:BaseComponent::BaseComponent(pParent)
 	,m_pLevel{ pLevel }
 	,m_currentState{MovementState::Idle}
 	,m_targetPosition{ glm::vec3{} }
 	,m_speed{speed}
 {
-	auto pos = pLevel->GetParent()->GetLocalPosition();
+	m_pCurrentBlock = pLevel->GetBlock(row, column);
+
+	auto levelPos = m_pLevel->GetParent()->GetLocalPosition();
+	auto pos = glm::vec2(levelPos.x, levelPos.y) + m_pCurrentBlock->pos;
+
 	m_blockSize = pLevel->GetBlockSize();
-	auto qbertSize = pParent->GetComponent<dae::RenderComponent>()->GetTextureSize();
+	auto textureSize = pParent->GetComponent<dae::RenderComponent>()->GetTextureSize();
 
-	pParent->SetLocalPosition(glm::vec3(pos.x + m_blockSize /2.f - qbertSize.x/2.f,pos.y - qbertSize.y/2.f,pos.z));
+	pParent->SetLocalPosition(glm::vec3(pos.x + m_blockSize /2.f - textureSize.x/2.f, pos.y - textureSize.y/2.f,0));
 
-	m_pCurrentBlock = pLevel->GetBlock(0,0);
+	
 }
 
-bool dae::MoveComponent::Move(const dae::Direction& direction)
+bool dae::MoveComponent::Move(const glm::vec2& direction)
 {
 	if (!(m_currentState == MovementState::Idle))
 	{
@@ -28,34 +32,13 @@ bool dae::MoveComponent::Move(const dae::Direction& direction)
 
 	auto pos = m_pParent->GetLocalPosition();
 	
-	switch (direction)
-	{
-	case Direction::Topleft:
-	{
-		m_targetPosition = { pos.x - m_blockSize / 2.f,pos.y - m_blockSize * 3.f / 4.f,pos.z };
-		m_pCurrentBlock = m_pLevel->GetBlock(m_pCurrentBlock->row - 1 ,m_pCurrentBlock->column - 1);
-		
-		break;
-	}
-	case Direction::TopRight:
-	{
-		m_targetPosition = { pos.x + m_blockSize / 2.f,pos.y - m_blockSize * 3.f / 4.f,pos.z };
-		m_pCurrentBlock = m_pLevel->GetBlock(m_pCurrentBlock->row - 1,m_pCurrentBlock->column);
-		break;
-	}
-	case Direction::BottomLeft:
-	{
-		m_targetPosition = { pos.x - m_blockSize / 2.f,pos.y + m_blockSize * 3.f / 4.f,pos.z };
-		m_pCurrentBlock = m_pLevel->GetBlock(m_pCurrentBlock->row + 1,m_pCurrentBlock->column);
-		break;
-	}
-	case Direction::BottomRight:
-	{
-		m_targetPosition = { pos.x + m_blockSize / 2.f,pos.y + m_blockSize * 3.f / 4.f,pos.z };
-		m_pCurrentBlock = m_pLevel->GetBlock(m_pCurrentBlock->row + 1,m_pCurrentBlock->column + 1);
-		break;
-	}
-	}
+	int row = m_pCurrentBlock->row;
+	int column = m_pCurrentBlock->column;
+
+	GetNextRowColumn(row, column, direction);
+
+	m_targetPosition = { pos.x + (m_blockSize / 2.f) * direction.x,pos.y + (m_blockSize * 3.f / 4.f) * (direction.y * -1),pos.z };
+	m_pCurrentBlock = m_pLevel->GetBlock(row, column);
 
 	m_currentState = MovementState::Moving;
 	return true;
@@ -80,6 +63,22 @@ void dae::MoveComponent::Fall()
 	m_pParent->SetLocalPosition(pos);
 }
 
+void dae::MoveComponent::GetNextRowColumn(int& row, int& column, const glm::vec2& dir)
+{
+	int dirX = static_cast<int>(dir.x);
+	int dirY = static_cast<int>(dir.y);
+
+
+	row += (dirY * -1);
+	if (dirX == 1 && dirY == -1)
+	{
+		column += 1;
+	}
+	else if(dirX == -1 && dirY == 1)
+	{
+		column -= 1;
+	}
+}
 
 void dae::MoveComponent::Update()
 {

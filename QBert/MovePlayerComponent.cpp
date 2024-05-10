@@ -7,18 +7,23 @@
 #include "ScoreComponent.h"
 
 dae::MovePlayerComponent::MovePlayerComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed)
-	:MoveComponent::MoveComponent(pParent,pLevel,speed)
+	:MoveComponent::MoveComponent(pParent,pLevel, speed)
 	,m_pScoreComponent{ pParent->GetComponent<ScoreComponent>() }
 	,m_pHealthComponent{ pParent->GetComponent<HealthComponent>() }
 	,m_hasMoved{false}
 {
-	//pLevel->AddEntity(std::make_unique<Entity>(pMoveComp->GetCurrentBlock()->idx,EntityType::Player));
+	m_entityIdx = pLevel->AddEntity(std::make_unique<Entity>(m_pCurrentBlock->row, m_pCurrentBlock->column,EntityType::Player));
 }
 
-void dae::MovePlayerComponent::MovePlayer(const dae::Direction& direction)
+void dae::MovePlayerComponent::MovePlayer(const glm::vec2& direction)
 {
+	int currentRow = m_pCurrentBlock->row;
+	int currentColumn = m_pCurrentBlock->column;
+
 	if (Move(direction))
 	{
+		GetNextRowColumn(currentRow, currentColumn, direction);
+		m_pLevel->UpdateEntity(m_entityIdx, currentRow, currentColumn);
 		auto& ss = SoundLocater::GetSoundsystem();
 		ss.Play("../Resources/Sounds/JumpSound.wav", 1);
 	}

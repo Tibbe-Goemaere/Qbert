@@ -2,7 +2,7 @@
 #include "GameObject.h"
 #include "MovePlayerComponent.h"
 
-dae::MovePlayerCommand::MovePlayerCommand(dae::GameObject* pObject, const dae::Direction& direction)
+dae::MovePlayerCommand::MovePlayerCommand(dae::GameObject* pObject, const glm::vec2& direction)
 	:m_pGameObject{pObject}
 	,m_direction{direction}
 {
@@ -11,5 +11,9 @@ dae::MovePlayerCommand::MovePlayerCommand(dae::GameObject* pObject, const dae::D
 
 void dae::MovePlayerCommand::Execute()
 {
-	m_pPlayerMovement->MovePlayer(m_direction);
+	if (m_pPlayerMovement)
+	{
+		m_pPlayerMovement->MovePlayer(m_direction);
+	}
+	
 }

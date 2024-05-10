@@ -65,9 +65,32 @@ int dae::LevelComponent::GetAmountOfLayers() const
 	return m_amountOfSteps;
 }
 
-void dae::LevelComponent::AddEntity(std::unique_ptr<Entity> pNewEntity)
+int dae::LevelComponent::AddEntity(std::unique_ptr<Entity> pNewEntity)
 {
 	m_pEntities.push_back(std::move(pNewEntity));
+	return static_cast<int>(m_pEntities.size()) - 1;
+}
+
+dae::Entity* dae::LevelComponent::GetEntity(EntityType entityType) const
+{
+	auto it = std::find_if(m_pEntities.begin(), m_pEntities.end(),
+		[entityType](const std::unique_ptr<Entity>& entity)
+		{
+			return entity->entityType == entityType;
+		});
+
+	if (it != m_pEntities.end())
+	{
+		return it->get(); 
+	}
+	return nullptr;
+}
+
+void dae::LevelComponent::UpdateEntity(int entityIdx, int row, int column)
+{
+	auto pEntity = m_pEntities[entityIdx].get();
+	pEntity->row = row;
+	pEntity->column = column;
 }
 
 void dae::LevelComponent::Update()

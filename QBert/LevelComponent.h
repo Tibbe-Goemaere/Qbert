@@ -37,7 +37,8 @@ namespace dae
 
 	struct Entity
 	{
-		int blockIdx;
+		int row;
+		int column;
 		EntityType entityType = EntityType::None;
 	};
 
@@ -59,7 +60,11 @@ namespace dae
 		float GetBlockSize() const;
 		bool ChangeBlock(int idx, int textureIdx);
 		int GetAmountOfLayers() const;
-		void AddEntity(std::unique_ptr<Entity> pNewEntity);
+
+		//Handling Entities
+		int AddEntity(std::unique_ptr<Entity> pNewEntity);
+		Entity* GetEntity(EntityType entityType) const;
+		void UpdateEntity(int entityIdx, int row, int column);
 
 	private:
 		std::vector<std::unique_ptr<Block>> m_pBlocks;

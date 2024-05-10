@@ -6,8 +6,8 @@
 #include "TimeManager.h"
 #include <cstdlib>
 
-dae::FollowPlayerComponent::FollowPlayerComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed, float waitTime)
-	:MoveComponent::MoveComponent(pParent,pLevel,speed)
+dae::FollowPlayerComponent::FollowPlayerComponent(dae::GameObject* pParent, LevelComponent* pLevel, int row, int column, float speed, float waitTime)
+	:MoveComponent::MoveComponent(pParent,pLevel, speed,row,column)
 	, m_timer{ 0 }
 	, m_waitTime{ waitTime }
 {}
@@ -28,27 +28,15 @@ void dae::FollowPlayerComponent::Update()
 		}
 		m_timer = 0;
 
-		if (m_pCurrentBlock->row == (m_pLevel->GetAmountOfLayers() - 1))
-		{
-			m_timer = m_waitTime;
-		}
-
 		if (CheckDeath())
 		{
 			Fall();
+			return;
 		}
 
+		Move(FindNextBlock());
 
 		moveLeft = (rand() % 2) == 0;
-
-		if (moveLeft)
-		{
-			Move(FindNextBlock());
-		}
-		else
-		{
-			Move(dae::Direction::BottomRight);
-		}
 		break;
 	case dae::MovementState::Moving:
 		break;
@@ -59,10 +47,58 @@ void dae::FollowPlayerComponent::Update()
 	}
 }
 
-dae::Direction dae::FollowPlayerComponent::FindNextBlock()
+glm::vec2 dae::FollowPlayerComponent::FindNextBlock() const
 {
-	//m_pLevel.
-	return dae::Direction();
+	auto entity = m_pLevel->GetEntity(EntityType::Player);
+
+	int rowDifference = std::abs(m_pCurrentBlock->row - entity->row) - 1;
+	glm::vec2 direction(0, 0);
+	if (m_pCurrentBlock->row < entity->row)
+	{
+		direction.y = -1;
+		if (entity->column > m_pCurrentBlock->column + rowDifference)
+		{
+			direction.x = 1;
+		}
+		else
+		{
+			direction.x = -1;
+		}
+	}
+	else if (m_pCurrentBlock->row > entity->row)
+	{
+		direction.y = 1;
+		if (entity->column >= m_pCurrentBlock->column - rowDifference)
+		{
+			direction.x = 1;
+		}
+		else
+		{
+			direction.x = -1;
+		}
+	}
+	else
+	{
+		if (m_pCurrentBlock->row == (m_pLevel->GetAmountOfLayers() - 1))
+		{
+			direction.y = 1;
+		}
+		else
+		{
+			direction.y = -1;
+		}
+
+		if (entity->column > m_pCurrentBlock->column)
+		{
+			direction.x = 1;
+		}
+		else
+		{
+			direction.x = -1;
+		}
+	}
+
+	return direction;
 }
 
 

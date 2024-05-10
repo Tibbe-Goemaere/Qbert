@@ -11,7 +11,7 @@ namespace dae
 	public:
 		void Update() override;
 
-		FollowPlayerComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel, float speed = 150.f, float waitTime = 0.5f);
+		FollowPlayerComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel, int row, int column, float speed = 150.f, float waitTime = 0.5f);
 		virtual ~FollowPlayerComponent() = default;
 		FollowPlayerComponent(const FollowPlayerComponent& other) = delete;
 		FollowPlayerComponent(FollowPlayerComponent&& other) = delete;
@@ -21,6 +21,6 @@ namespace dae
 		float m_timer;
 		const float m_waitTime;
 
-		dae::Direction FindNextBlock();
+		glm::vec2 FindNextBlock() const;
 	};
 }

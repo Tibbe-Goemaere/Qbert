@@ -17,12 +17,12 @@ namespace dae
 	class MovePlayerCommand final : public dae::Command
 	{
 	public:
-		MovePlayerCommand(dae::GameObject* pObject, const Direction& direction);
+		MovePlayerCommand(dae::GameObject* pObject, const glm::vec2& direction);
 
 		void Execute() override;
 	private:
 		dae::GameObject* m_pGameObject;
-		const Direction m_direction;
+		const glm::vec2 m_direction;
 		dae::MovePlayerComponent* m_pPlayerMovement;
 	};
 }

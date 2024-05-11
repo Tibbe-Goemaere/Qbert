@@ -50,6 +50,15 @@ void dae::MoveDownComponent::Update()
 			return;
 		}
 
+		if (m_pCurrentBlock != nullptr)
+		{
+			if (m_pCurrentBlock->row == (m_pLevel->GetAmountOfLayers() - 1))
+			{
+				m_isAtBottom = true;
+				return;
+			}
+		}
+
 		//Movement down pyramid
 		moveLeft = (rand() % 2) == 0;
 
@@ -60,14 +69,6 @@ void dae::MoveDownComponent::Update()
 		else
 		{
 			Move(glm::vec2(1,-1));
-		}
-
-		if (m_pCurrentBlock != nullptr)
-		{
-			if (m_pCurrentBlock->row == (m_pLevel->GetAmountOfLayers() - 1))
-			{
-				m_isAtBottom = true;
-			}
 		}
 
 		break;

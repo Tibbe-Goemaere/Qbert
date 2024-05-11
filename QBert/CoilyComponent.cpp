@@ -4,7 +4,6 @@
 #include "FollowPlayerComponent.h"
 #include "RenderComponent.h"
 #include "LevelComponent.h"
-#include "CoilyState.h"
 
 
 dae::CoilyComponent::CoilyComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel)
@@ -31,15 +30,7 @@ void dae::CoilyComponent::Update()
 	if (newState != nullptr)
 	{
 		m_pCoilyState = std::move(newState);
-	}
-	
-	if (m_pEggMovement->IsAtBottom())
-	{
-		auto pLevel = m_pEggMovement->GetLevel();
-		auto pCurrentBlock = m_pEggMovement->GetCurrentBlock();
-		m_pParent->RemoveComponent<MoveDownComponent>();
-		m_pCoilyMovement = m_pParent->AddComponent<FollowPlayerComponent>(pLevel,pCurrentBlock->row,pCurrentBlock->column);
-		SetTexture("Resources/Sprites/Coily.png");
+		m_pCoilyState->OnEnter(this);
 	}
 }
 
@@ -47,5 +38,23 @@ void dae::CoilyComponent::SetTexture(const std::string& filepath)
 {
 	m_pRenderComponent->SetRenderTexture(false);
 	m_pRenderComponent->SetTexture(filepath);
+}
+
+bool dae::CoilyComponent::IsAtBottom()
+{
+	if (m_pEggMovement != nullptr)
+	{
+		return m_pEggMovement->IsAtBottom();
+	}
+	return false;
+}
+
+void dae::CoilyComponent::ChangeToSnake()
+{
+	SetTexture("../Resources/Sprites/Coily.png");
+	auto pLevel = m_pEggMovement->GetLevel();
+	auto pCurrentBlock = m_pEggMovement->GetCurrentBlock();
+	m_pParent->RemoveComponent<MoveDownComponent>();
+	m_pCoilyMovement = m_pParent->AddComponent<FollowPlayerComponent>(pLevel, pCurrentBlock->row, pCurrentBlock->column);
 }
 

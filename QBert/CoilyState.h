@@ -10,7 +10,6 @@ namespace dae
 	{
 	public:
 		static std::unique_ptr<CoilyState> EggState;
-		static std::unique_ptr<CoilyState> TransformingState;
 		static std::unique_ptr<CoilyState> SnakeState;
 		static std::unique_ptr<CoilyState> DyingState;
 
@@ -20,8 +19,8 @@ namespace dae
 		CoilyState& operator=(const CoilyState& other) = delete;
 		CoilyState& operator=(CoilyState&& other) = delete;
 
-		virtual std::unique_ptr<CoilyState> Update(CoilyComponent*) {};
-		virtual void OnEnter();
+		virtual std::unique_ptr<CoilyState> Update(CoilyComponent*) { return nullptr; };
+		virtual void OnEnter(CoilyComponent*) {}
 	protected:
 		explicit CoilyState() = default;
 	};
@@ -31,14 +30,7 @@ namespace dae
 	public:
 		virtual ~EggState() {}
 		virtual std::unique_ptr<CoilyState> Update(CoilyComponent* pComponent) override;
-		virtual void OnEnter() override {};
-	};
-
-	class TransformingState final : public CoilyState
-	{
-	public:
-		virtual ~TransformingState() {}
-		virtual std::unique_ptr<CoilyState> Update(CoilyComponent* pComponent) override;
+		virtual void OnEnter(CoilyComponent*) override {};
 	};
 
 
@@ -47,6 +39,7 @@ namespace dae
 	public:
 		virtual ~SnakeState() {}
 		virtual std::unique_ptr<CoilyState> Update(CoilyComponent* pComponent) override;
+		virtual void OnEnter(CoilyComponent*) override;
 	};
 
 	class DyingState final : public CoilyState

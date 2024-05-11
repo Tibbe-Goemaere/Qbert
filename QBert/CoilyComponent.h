@@ -1,10 +1,10 @@
 #pragma once
 #include "BaseComponent.h"
 #include <string>
+#include "CoilyState.h"
 
 namespace dae
 {
-	class CoilyState;
 	class GameObject;
 	class MoveDownComponent;
 	class FollowPlayerComponent;
@@ -24,6 +24,8 @@ namespace dae
 		CoilyComponent& operator=(CoilyComponent&& other) = delete;
 
 		void SetTexture(const std::string& filepath);
+		bool IsAtBottom();
+		void ChangeToSnake();
 
 	private:
 		dae::MoveDownComponent* m_pEggMovement;

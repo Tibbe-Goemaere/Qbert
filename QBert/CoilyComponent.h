@@ -26,12 +26,12 @@ namespace dae
 		void SetTexture(const std::string& filepath);
 		bool IsAtBottom();
 		void ChangeToSnake();
+		bool IsDead();
 
 	private:
 		dae::MoveDownComponent* m_pEggMovement;
 		dae::FollowPlayerComponent* m_pCoilyMovement;
 		dae::RenderComponent* m_pRenderComponent;
-		bool doOnce = true;
 
 		std::unique_ptr<CoilyState> m_pCoilyState;
 	};

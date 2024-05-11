@@ -28,9 +28,8 @@ void dae::FollowPlayerComponent::Update()
 		}
 		m_timer = 0;
 
-		if (CheckDeath())
+		if (MoveComponent::CheckDeath())
 		{
-			Fall();
 			return;
 		}
 
@@ -45,6 +44,15 @@ void dae::FollowPlayerComponent::Update()
 	default:
 		break;
 	}
+}
+
+bool dae::FollowPlayerComponent::CheckDeath()
+{
+	if (m_currentState == dae::MovementState::Falling)
+	{
+		return true;
+	}
+	return false;
 }
 
 glm::vec2 dae::FollowPlayerComponent::FindNextBlock() const

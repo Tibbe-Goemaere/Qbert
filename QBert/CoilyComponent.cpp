@@ -58,3 +58,12 @@ void dae::CoilyComponent::ChangeToSnake()
 	m_pCoilyMovement = m_pParent->AddComponent<FollowPlayerComponent>(pLevel, pCurrentBlock->row, pCurrentBlock->column);
 }
 
+bool dae::CoilyComponent::IsDead()
+{
+	if (m_pCoilyMovement != nullptr)
+	{
+		return m_pCoilyMovement->CheckDeath();
+	}
+	return true;
+}
+

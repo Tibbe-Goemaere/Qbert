@@ -17,6 +17,8 @@ namespace dae
 		FollowPlayerComponent(FollowPlayerComponent&& other) = delete;
 		FollowPlayerComponent& operator=(const FollowPlayerComponent& other) = delete;
 		FollowPlayerComponent& operator=(FollowPlayerComponent&& other) = delete;
+
+		bool CheckDeath();
 	private:
 		float m_timer;
 		const float m_waitTime;

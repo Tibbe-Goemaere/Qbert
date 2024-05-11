@@ -14,8 +14,12 @@ std::unique_ptr<dae::CoilyState> dae::EggState::Update(CoilyComponent* pCoilyCom
 	return nullptr;
 }
 
-std::unique_ptr<dae::CoilyState> dae::SnakeState::Update(CoilyComponent*)
+std::unique_ptr<dae::CoilyState> dae::SnakeState::Update(CoilyComponent* pCoilyComponent)
 {
+	if (pCoilyComponent->IsDead())
+	{
+		//return std::move(CoilyState::DyingState);
+	}
 	return nullptr;
 }
 

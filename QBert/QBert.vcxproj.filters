@@ -42,13 +42,10 @@
     <ClCompile Include="MoveDownComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="FollowPlayerComponent.cpp">
-      <Filter>Source Files\Components</Filter>
-    </ClCompile>
     <ClCompile Include="CoilyComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="CoilyMoveState.cpp">
+    <ClCompile Include="CoilyState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -71,13 +68,10 @@
     <ClInclude Include="MoveDownComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="FollowPlayerComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
     <ClInclude Include="CoilyComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="CoilyMoveState.h">
+    <ClInclude Include="CoilyState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -24,7 +24,6 @@
 #include "CostumCommands.h"
 #include "SoundSystem.h"
 #include "MoveDownComponent.h"
-#include "FollowPlayerComponent.h"
 #include "CoilyComponent.h"
 
 using namespace dae;

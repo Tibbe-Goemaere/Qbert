@@ -1,15 +1,15 @@
 #pragma once
 #include "BaseComponent.h"
 #include <string>
-#include "CoilyState.h"
+#include "CoilyMoveState.h"
 
 namespace dae
 {
 	class GameObject;
-	class MoveDownComponent;
 	class FollowPlayerComponent;
 	class RenderComponent;
 	class LevelComponent;
+	class MoveComponent;
 
 	class CoilyComponent final : public BaseComponent
 	{
@@ -24,16 +24,15 @@ namespace dae
 		CoilyComponent& operator=(CoilyComponent&& other) = delete;
 
 		void SetTexture(const std::string& filepath);
-		bool IsAtBottom();
 		void ChangeToSnake();
 		bool IsDead();
+		GameObject* GetParent() const;
 
 	private:
-		dae::MoveDownComponent* m_pEggMovement;
+		dae::MoveComponent* m_pMoveComponent;
 		dae::FollowPlayerComponent* m_pCoilyMovement;
 		dae::RenderComponent* m_pRenderComponent;
-
-		std::unique_ptr<CoilyState> m_pCoilyState;
+		std::unique_ptr<CoilyMoveState> m_pCoilyState;
 	};
 }
 

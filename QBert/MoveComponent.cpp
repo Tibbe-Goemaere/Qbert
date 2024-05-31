@@ -44,6 +44,16 @@ bool dae::MoveComponent::Move(const glm::vec2& direction)
 	return true;
 }
 
+dae::Block* dae::MoveComponent::GetCurrentBlock() const
+{
+	return m_pCurrentBlock;
+}
+
+dae::LevelComponent* dae::MoveComponent::GetLevel() const
+{
+	return m_pLevel;
+}
+
 bool dae::MoveComponent::CheckDeath()
 {
 	if (m_pCurrentBlock == nullptr)

@@ -15,7 +15,7 @@
     <Filter Include="Source Files\Components">
       <UniqueIdentifier>{863f0897-9996-4892-a8aa-730f87de2990}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Resource Files">
+    <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
@@ -48,7 +48,7 @@
     <ClCompile Include="CoilyComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="CoilyState.cpp">
+    <ClCompile Include="CoilyMoveState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,7 +77,7 @@
     <ClInclude Include="CoilyComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="CoilyState.h">
+    <ClInclude Include="CoilyMoveState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

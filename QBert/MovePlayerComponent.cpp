@@ -25,7 +25,7 @@ void dae::MovePlayerComponent::MovePlayer(const glm::vec2& direction)
 		GetNextRowColumn(currentRow, currentColumn, direction);
 		m_pLevel->UpdateEntity(m_entityIdx, currentRow, currentColumn);
 		auto& ss = SoundLocater::GetSoundsystem();
-		ss.Play("../Resources/Sounds/JumpSound.wav", 1);
+		ss.Play("../Data/Sounds/JumpSound.wav", 1);
 	}
 }
 

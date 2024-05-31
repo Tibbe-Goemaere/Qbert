@@ -31,13 +31,13 @@ using namespace dae;
 void load()
 {
 	SoundLocater::RegisterSoundSystem(std::make_unique<SdlSoundSystem>());
-	auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 18);
+	auto font = dae::ResourceManager::GetInstance().LoadFont("Fonts/Lingua.otf", 18);
 
 	auto& scene = dae::SceneManager::GetInstance().CreateScene("Level1");
 
 	auto level = std::make_unique<dae::GameObject>();
 	level->AddComponent<dae::RenderComponent>();
-	auto level1Component = level->AddComponent<dae::LevelComponent>("../Levels/Level1-0.xml");
+	auto level1Component = level->AddComponent<dae::LevelComponent>("../Data/Levels/Level1-0.xml");
 	level->SetLocalPosition({ 288,50,0 });
 	scene.Add(std::move(level));
 
@@ -60,7 +60,7 @@ void load()
 
 	//RenderComponent
 	auto renderQbert = qbert->AddComponent<dae::RenderComponent>();
-	renderQbert->SetTexture("../Resources/Sprites/Qbert.png");
+	renderQbert->SetTexture("Sprites/Qbert.png");
 
 	//ScoreComponent
 	qbert->AddComponent<dae::ScoreComponent>();
@@ -80,7 +80,7 @@ void load()
 
 	//RenderComponent
 	auto renderCoily = coily->AddComponent<dae::RenderComponent>();
-	renderCoily->SetTexture("../Resources/Sprites/CoilyEgg.png");
+	renderCoily->SetTexture("Sprites/CoilyEgg.png");
 
 	//Movemement
 	coily->AddComponent<dae::CoilyComponent>(level1Component);

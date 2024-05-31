@@ -99,7 +99,7 @@ void dae::SnakeState::OnEnter(CoilyComponent* pCoilyComponent)
 	auto pRenderComp = pCoilyComponent->GetParent()->GetComponent<dae::RenderComponent>();
 	if (pRenderComp)
 	{
-		pRenderComp->SetTexture("../Resources/Sprites/Coily.png");
+		pRenderComp->SetTexture("Sprites/Coily.png");
 	}
 }
 

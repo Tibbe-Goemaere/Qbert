@@ -25,6 +25,7 @@
 #include "SoundSystem.h"
 #include "MoveDownComponent.h"
 #include "CoilyComponent.h"
+#include "DiskComponent.h"
 
 using namespace dae;
 
@@ -115,6 +116,11 @@ void load()
 		, font);
 	go->SetLocalPosition(glm::vec3(10, 440, 0));
 	scene.Add(std::move(go));
+
+	//Add disks
+	auto disk = std::make_unique<dae::GameObject>();
+	disk->AddComponent<dae::DiskComponent>(level1Component,true,1);
+	scene.Add(std::move(disk));
 }
 
 int main(int, char* [])

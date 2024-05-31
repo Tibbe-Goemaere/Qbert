@@ -178,6 +178,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_mixer\lib\$(PlatformTarget)\*.dll" "$(OutputP
     <ClCompile Include="CoilyComponent.cpp" />
     <ClCompile Include="CoilyState.cpp" />
     <ClCompile Include="CostumCommands.cpp" />
+    <ClCompile Include="DiskComponent.cpp" />
     <ClCompile Include="LevelComponent.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoveComponent.cpp" />
@@ -189,6 +190,7 @@ xcopy "$(SolutionDir)3rdParty\SDL2_mixer\lib\$(PlatformTarget)\*.dll" "$(OutputP
     <ClInclude Include="CoilyComponent.h" />
     <ClInclude Include="CoilyState.h" />
     <ClInclude Include="CostumCommands.h" />
+    <ClInclude Include="DiskComponent.h" />
     <ClInclude Include="LevelComponent.h" />
     <ClInclude Include="MoveComponent.h" />
     <ClInclude Include="MoveDownComponent.h" />

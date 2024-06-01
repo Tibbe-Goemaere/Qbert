@@ -56,3 +56,8 @@ glm::vec2 dae::RenderComponent::GetTextureSize(const std::string& filename) cons
 	return glm::vec2(pTexture->GetSize().x, pTexture->GetSize().y);
 }
 
+glm::vec2 dae::RenderComponent::GetTextureSizeViaIdx(int textureIdx) const
+{
+	return glm::vec2(m_pTextures[textureIdx].pTexture->GetSize().x, m_pTextures[textureIdx].pTexture->GetSize().y);
+}
+

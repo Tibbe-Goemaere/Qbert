@@ -105,6 +105,7 @@ void dae::SnakeState::OnEnter(CoilyComponent* pCoilyComponent)
 
 void dae::SnakeState::OnExit(CoilyComponent*)
 {
+	m_pMoveComponent->StartFalling();
 }
 
 glm::vec2 dae::SnakeState::FindNextBlock() const
@@ -114,7 +115,12 @@ glm::vec2 dae::SnakeState::FindNextBlock() const
 	auto entity = level->GetEntity(EntityType::Player);
 
 	int rowDifference = std::abs(block->row - entity->row) - 1;
-	glm::vec2 direction(0, 0);
+	glm::vec2 direction(0, 1);
+
+	if (block->row < entity->row)
+	{
+		direction.y = -1;
+	}
 	if (block->row < entity->row)
 	{
 		direction.y = -1;
@@ -174,6 +180,7 @@ std::unique_ptr<dae::CoilyState> dae::DyingState::Update(CoilyComponent*)
 
 void dae::DyingState::OnEnter(CoilyComponent*)
 {
+
 }
 
 void dae::DyingState::OnExit(CoilyComponent*)

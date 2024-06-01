@@ -26,5 +26,6 @@ namespace dae
 		dae::HealthComponent* m_pHealthComponent;
 		bool m_hasMoved;
 		int m_entityIdx;
+		bool m_onDisk;
 	};
 }

@@ -3,12 +3,14 @@
 #include <fstream>
 #include <iostream>
 #include "BaseComponent.h"
+#include "DiskComponent.h"
 
 dae::LevelComponent::LevelComponent(dae::GameObject* pParent, const std::string& levelPath)
 	:BaseComponent::BaseComponent(pParent)
 	,m_pRenderComponent(pParent->GetComponent<dae::RenderComponent>())
 	,m_amountOfLayers{2}
 	,m_amountOfSteps{7}
+	,m_pDisks{}
 {
 	//WriteLevel("Level1-0.xml", XmlLevelInfo{ false,false,"../Resources/Blocks/0-2.png", "../Resources/Blocks/0-1.png"});
 	LoadLevel(levelPath);
@@ -91,6 +93,26 @@ void dae::LevelComponent::UpdateEntity(int entityIdx, int row, int column)
 	auto pEntity = m_pEntities[entityIdx].get();
 	pEntity->row = row;
 	pEntity->column = column;
+}
+
+void dae::LevelComponent::AddDisk(dae::DiskComponent* pDiskComponent)
+{
+	m_pDisks.push_back(pDiskComponent);
+}
+
+void dae::LevelComponent::RemoveDisk(DiskComponent* pDiskComponent)
+{
+	m_pDisks.erase(std::remove(m_pDisks.begin(), m_pDisks.end(), pDiskComponent), m_pDisks.end());
+}
+
+dae::DiskComponent* dae::LevelComponent::GetDisk(int row, int column)
+{
+	auto it = std::find_if(m_pDisks.begin(), m_pDisks.end(), [row, column](dae::DiskComponent* disk) {auto [diskRow, diskCol] = disk->GetGridPosition();  return diskRow == row && diskCol == column; });
+	if (it != m_pDisks.end())
+	{
+		return *it;
+	}
+	return nullptr;
 }
 
 void dae::LevelComponent::Update()

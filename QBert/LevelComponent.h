@@ -8,6 +8,7 @@ namespace dae
 	class BaseComponent;
 	class GameObject;
 	class Texture2D;
+	class DiskComponent;
 
 	struct XmlLevelInfo
 	{
@@ -66,6 +67,11 @@ namespace dae
 		Entity* GetEntity(EntityType entityType) const;
 		void UpdateEntity(int entityIdx, int row, int column);
 
+		//Handling Disks
+		void AddDisk(DiskComponent* pDiskComponent);
+		void RemoveDisk(DiskComponent* pDiskComponent);
+		DiskComponent* GetDisk(int row, int column);
+
 	private:
 		std::vector<std::unique_ptr<Block>> m_pBlocks;
 		std::vector<std::string> m_texturePaths;
@@ -74,10 +80,13 @@ namespace dae
 		int m_amountOfLayers;
 		int m_amountOfSteps;
 		std::vector<std::unique_ptr<Entity>> m_pEntities;
+		std::vector<DiskComponent*> m_pDisks;
 
 		void SetTextures();
 		void LoadLevel(const std::string& filename);
 		void WriteLevel(const std::string& filename, XmlLevelInfo info);
+
+		 
 	};
 
 	

@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseComponent.h"
+#include "utility"
 
 namespace dae
 {
@@ -19,10 +20,15 @@ namespace dae
 		DiskComponent& operator=(const DiskComponent& other) = delete;
 		DiskComponent& operator=(DiskComponent&& other) = delete;
 
+		std::pair<int, int> GetGridPosition() const;
+		void Activate();
 	private:
 		dae::RenderComponent* m_pRenderComponent;
 		dae::LevelComponent* m_pLevelComponent;
 		const float m_speed;
+		std::pair<int, int> m_gridPosition;
+		bool m_isMoving;
+		glm::vec3 m_targetPosition;
 
 		void SetStartPosition(bool isOnLeftSide, int rowNr);
 	};

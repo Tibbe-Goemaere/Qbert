@@ -46,7 +46,6 @@ void dae::MoveDownComponent::Update()
 
 		if (CheckDeath())
 		{
-			Fall();
 			return;
 		}
 

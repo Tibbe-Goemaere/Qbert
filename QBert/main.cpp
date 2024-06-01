@@ -26,6 +26,7 @@
 #include "MoveDownComponent.h"
 #include "CoilyComponent.h"
 #include "DiskComponent.h"
+#include "SlickComponent.h"
 
 using namespace dae;
 
@@ -36,12 +37,17 @@ void load()
 
 	auto& scene = dae::SceneManager::GetInstance().CreateScene("Level1");
 
+	// Add level
 	auto level = std::make_unique<dae::GameObject>();
 	level->AddComponent<dae::RenderComponent>();
 	auto level1Component = level->AddComponent<dae::LevelComponent>("../Data/Levels/Level1-0.xml");
-	level->SetLocalPosition({ 288,50,0 });
+	level->SetLocalPosition({ 288,70,0 });
 	scene.Add(std::move(level));
 
+	//Add disks
+	auto disk = std::make_unique<dae::GameObject>();
+	disk->AddComponent<dae::DiskComponent>(level1Component, false, 1);
+	scene.Add(std::move(disk));
 
 	//Add UI
 	auto uiPointsObject = std::make_unique<dae::GameObject>();
@@ -88,6 +94,10 @@ void load()
 	
 	scene.Add(std::move(coily));
 
+	//Slick
+	auto slick = std::make_unique<dae::GameObject>();
+	slick->AddComponent<dae::SlickComponent>(level1Component,"Sprites/Slick.png");
+	scene.Add(std::move(slick));
 
 	//Qbert Commands
 	auto upLeftQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(1,1));
@@ -116,11 +126,6 @@ void load()
 		, font);
 	go->SetLocalPosition(glm::vec3(10, 440, 0));
 	scene.Add(std::move(go));
-
-	//Add disks
-	auto disk = std::make_unique<dae::GameObject>();
-	disk->AddComponent<dae::DiskComponent>(level1Component,true,1);
-	scene.Add(std::move(disk));
 }
 
 int main(int, char* [])

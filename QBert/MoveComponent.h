@@ -23,14 +23,12 @@ namespace dae
 		MoveComponent& operator=(const MoveComponent& other) = delete;
 		MoveComponent& operator=(MoveComponent&& other) = delete;
 
-		bool Move(const glm::vec2& direction);
+		bool Move(const glm::vec2& direction, float distanceScale = 1.f);
 		Block* GetCurrentBlock() const;
 		dae::LevelComponent* GetLevel() const;
 		bool CheckDeath();
-
+		void StartFalling();
 	protected:
-		
-		void Fall();
 		void GetNextRowColumn(int& row, int& column, const glm::vec2& dir);
 
 		dae::LevelComponent* m_pLevel;
@@ -41,5 +39,7 @@ namespace dae
 		float m_blockSize;
 		glm::vec3 m_targetPosition;
 		float m_speed;
+
+		void Fall();
 	};
 }

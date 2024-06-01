@@ -23,7 +23,7 @@ dae::MoveComponent::MoveComponent(dae::GameObject* pParent, LevelComponent* pLev
 	
 }
 
-bool dae::MoveComponent::Move(const glm::vec2& direction)
+bool dae::MoveComponent::Move(const glm::vec2& direction, float)
 {
 	if (!(m_currentState == MovementState::Idle))
 	{
@@ -37,7 +37,8 @@ bool dae::MoveComponent::Move(const glm::vec2& direction)
 
 	GetNextRowColumn(row, column, direction);
 
-	m_targetPosition = { pos.x + (m_blockSize / 2.f) * direction.x,pos.y + (m_blockSize * 3.f / 4.f) * (direction.y * -1),pos.z };
+	m_targetPosition = { pos.x + (m_blockSize / 2.f) * direction.x ,pos.y + (m_blockSize * 3.f / 4.f) * (direction.y * -1),pos.z };
+
 	m_pCurrentBlock = m_pLevel->GetBlock(row, column);
 
 	m_currentState = MovementState::Moving;
@@ -58,19 +59,18 @@ bool dae::MoveComponent::CheckDeath()
 {
 	if (m_pCurrentBlock == nullptr)
 	{
-		m_currentState = MovementState::Falling;
-		m_pParent->SetRenderLayer(-1);
 		return true;
 	}
 	return false;
 }
 
-void dae::MoveComponent::Fall()
+void dae::MoveComponent::StartFalling()
 {
-	const float fallSpeed = 550.f;
-	auto pos = m_pParent->GetLocalPosition();
-	pos = glm::vec3(pos.x,pos.y + fallSpeed * dae::TimeManager::GetInstance().GetDeltaTime(), pos.z);
-	m_pParent->SetLocalPosition(pos);
+	if (m_currentState == MovementState::Idle)
+	{
+		m_currentState = MovementState::Falling;
+		m_pParent->SetRenderLayer(-1);
+	}
 }
 
 void dae::MoveComponent::GetNextRowColumn(int& row, int& column, const glm::vec2& dir)
@@ -88,6 +88,14 @@ void dae::MoveComponent::GetNextRowColumn(int& row, int& column, const glm::vec2
 	{
 		column -= 1;
 	}
+}
+
+void dae::MoveComponent::Fall()
+{
+	const float fallSpeed = 550.f;
+	auto pos = m_pParent->GetLocalPosition();
+	pos = glm::vec3(pos.x, pos.y + fallSpeed * dae::TimeManager::GetInstance().GetDeltaTime(), pos.z);
+	m_pParent->SetLocalPosition(pos);
 }
 
 void dae::MoveComponent::Update()

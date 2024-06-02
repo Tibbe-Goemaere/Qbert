@@ -36,7 +36,6 @@ void dae::SlickComponent::Update()
 	switch (m_pMoveComponent->GetCurrentState())
 	{
 	case MovementState::Idle:
-		
 
 		m_timer += TimeManager::GetInstance().GetDeltaTime();
 		if (m_timer < m_waitTime)

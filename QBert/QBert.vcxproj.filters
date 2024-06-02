@@ -54,6 +54,9 @@
     <ClCompile Include="SlickComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
+    <ClCompile Include="EnemySpawner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CostumCommands.h">
@@ -85,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="SlickComponent.h">
       <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemySpawner.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

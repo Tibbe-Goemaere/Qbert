@@ -22,5 +22,7 @@ namespace dae
 		float m_timer;
 		const float m_waitTime;
 		MoveComponent* m_pMoveComponent;
+
+		void ChangeBackBlock();
 	};
 }

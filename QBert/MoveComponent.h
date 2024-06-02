@@ -8,7 +8,9 @@ namespace dae
 	{
 		Idle,
 		Moving,
-		Falling
+		Falling,
+		Arriving,
+		Dropping
 	};
 
 	class MoveComponent : public BaseComponent
@@ -28,18 +30,26 @@ namespace dae
 		dae::LevelComponent* GetLevel() const;
 		bool CheckDeath();
 		void StartFalling();
+		void DropOnLevel();
+		MovementState GetCurrentState() const;
+
 	protected:
 		void GetNextRowColumn(int& row, int& column, const glm::vec2& dir);
 
 		dae::LevelComponent* m_pLevel;
 		dae::Block* m_pCurrentBlock;
-		MovementState m_currentState;
+		
 
 	private:
+		MovementState m_currentState;
 		float m_blockSize;
 		glm::vec3 m_targetPosition;
 		float m_speed;
+		glm::vec3 m_startPosition;
+		glm::vec3 m_dropDirection;
+		std::pair<int, int> m_startGridPos;
 
 		void Fall();
+		void Drop();
 	};
 }

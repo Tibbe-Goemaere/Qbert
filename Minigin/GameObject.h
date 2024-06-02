@@ -17,6 +17,7 @@ namespace dae
 		void LateUpdate();
 		void Render() const;
 
+		void MarkForDestroy();
 		bool MarkedForDestroy() const;
 
 		void SetParent(GameObject* pParent, bool keepWorldPos);
@@ -57,12 +58,13 @@ namespace dae
 	private:
 		Transform m_transform{};
 		std::vector<std::unique_ptr<BaseComponent>> m_pComponents;
-		bool m_MarkedForDestroy{ false };
+		bool m_markedForDestroy{ false };
 
 		GameObject* m_pParent;
 		std::vector<std::unique_ptr<GameObject>> m_pChildren;
 		void AddChild(GameObject* pChild);
-		void RemoveChild(GameObject* pChild);
+		std::unique_ptr<GameObject> RemoveChild(GameObject* pChild);
+		
 
 		glm::vec3 m_worldPosition{};
 		glm::vec3 m_localPosition{};

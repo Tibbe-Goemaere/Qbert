@@ -48,15 +48,23 @@ float dae::LevelComponent::GetBlockSize() const
 	return m_pRenderComponent->GetTextureSize(m_texturePaths[0]).x;
 }
 
-bool dae::LevelComponent::ChangeBlock(int idx, int textureIdx)
+bool dae::LevelComponent::ChangeBlock(int idx, int textureIdx, bool goBack)
 {
 	const int amountOfBlocks = static_cast<int>(m_pBlocks.size());
 	//Check if were not on the final layer
-	if (textureIdx < (m_amountOfLayers - 1))
+	if (textureIdx < (m_amountOfLayers - 1) && !goBack)
 	{
 		m_pBlocks[idx]->textureIndex += 1;
 		m_pRenderComponent->SetRenderTexture(false, idx + (textureIdx * amountOfBlocks));
 		m_pRenderComponent->SetRenderTexture(true, idx + ((textureIdx + 1) * amountOfBlocks));
+		return true;
+
+	} //Check if we are not on the first layer
+	else if (textureIdx > 0 && goBack)
+	{
+		m_pBlocks[idx]->textureIndex -= 1;
+		m_pRenderComponent->SetRenderTexture(false, idx + (textureIdx * amountOfBlocks));
+		m_pRenderComponent->SetRenderTexture(true, idx + ((textureIdx - 1) * amountOfBlocks));
 		return true;
 	}
 	return false;

@@ -59,7 +59,7 @@ namespace dae
 		Block* GetBlock(const int row, const int column);
 		dae::GameObject* GetParent() const;
 		float GetBlockSize() const;
-		bool ChangeBlock(int idx, int textureIdx);
+		bool ChangeBlock(int idx, int textureIdx, bool goBack = false);
 		int GetAmountOfLayers() const;
 
 		//Handling Entities

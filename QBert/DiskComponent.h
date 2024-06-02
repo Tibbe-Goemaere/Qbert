@@ -22,13 +22,15 @@ namespace dae
 
 		std::pair<int, int> GetGridPosition() const;
 		void Activate();
+		GameObject* GetParent() const;
 	private:
 		dae::RenderComponent* m_pRenderComponent;
 		dae::LevelComponent* m_pLevelComponent;
 		const float m_speed;
 		std::pair<int, int> m_gridPosition;
-		bool m_isMoving;
+		bool m_activated;
 		glm::vec3 m_targetPosition;
+		glm::vec3 m_direction;
 
 		void SetStartPosition(bool isOnLeftSide, int rowNr);
 	};

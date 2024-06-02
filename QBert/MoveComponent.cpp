@@ -9,6 +9,8 @@ dae::MoveComponent::MoveComponent(dae::GameObject* pParent, LevelComponent* pLev
 	,m_currentState{MovementState::Idle}
 	,m_targetPosition{ glm::vec3{} }
 	,m_speed{speed}
+	,m_dropDirection{}
+	,m_startGridPos{std::make_pair(row,column)}
 {
 	m_pCurrentBlock = pLevel->GetBlock(row, column);
 
@@ -18,9 +20,8 @@ dae::MoveComponent::MoveComponent(dae::GameObject* pParent, LevelComponent* pLev
 	m_blockSize = pLevel->GetBlockSize();
 	auto textureSize = pParent->GetComponent<dae::RenderComponent>()->GetTextureSize();
 
-	pParent->SetLocalPosition(glm::vec3(pos.x + m_blockSize /2.f - textureSize.x/2.f, pos.y - textureSize.y/2.f,0));
-
-	
+	m_startPosition = glm::vec3(pos.x + m_blockSize / 2.f - textureSize.x / 2.f, pos.y - textureSize.y / 2.f, 0);
+	pParent->SetLocalPosition(m_startPosition);
 }
 
 bool dae::MoveComponent::Move(const glm::vec2& direction, float)
@@ -66,11 +67,20 @@ bool dae::MoveComponent::CheckDeath()
 
 void dae::MoveComponent::StartFalling()
 {
-	if (m_currentState == MovementState::Idle)
-	{
-		m_currentState = MovementState::Falling;
-		m_pParent->SetRenderLayer(-1);
-	}
+	m_currentState = MovementState::Falling;
+	m_pParent->SetRenderLayer(-1);
+}
+
+void dae::MoveComponent::DropOnLevel()
+{
+	m_currentState = MovementState::Dropping;
+	m_dropDirection = m_startPosition - m_pParent->GetLocalPosition();
+	glm::normalize(m_dropDirection);
+}
+
+dae::MovementState dae::MoveComponent::GetCurrentState() const
+{
+	return m_currentState;
 }
 
 void dae::MoveComponent::GetNextRowColumn(int& row, int& column, const glm::vec2& dir)
@@ -98,6 +108,23 @@ void dae::MoveComponent::Fall()
 	m_pParent->SetLocalPosition(pos);
 }
 
+void dae::MoveComponent::Drop()
+{
+	const float dropSpeed = 1.f;
+	
+	auto pos = m_pParent->GetLocalPosition();
+	pos += m_dropDirection * TimeManager::GetInstance().GetDeltaTime() * dropSpeed;
+	m_pParent->SetLocalPosition(pos);
+
+	float margin = 1.f;
+	if (glm::distance(pos, m_startPosition) <= margin)
+	{
+		m_pParent->SetLocalPosition(m_startPosition);
+		m_pCurrentBlock = m_pLevel->GetBlock(m_startGridPos.first, m_startGridPos.second);
+		m_currentState = MovementState::Idle;
+	}
+}
+
 void dae::MoveComponent::Update()
 {
 	BaseComponent::Update();
@@ -114,7 +141,7 @@ void dae::MoveComponent::Update()
 		if (glm::distance(pos,m_targetPosition) <= margin)
 		{
 			m_pParent->SetLocalPosition(m_targetPosition);
-			m_currentState = MovementState::Idle;
+			m_currentState = MovementState::Arriving;
 		}
 		else
 		{
@@ -126,6 +153,12 @@ void dae::MoveComponent::Update()
 		break;
 	case dae::MovementState::Falling:
 		Fall();
+		break;
+	case dae::MovementState::Arriving:
+		m_currentState = MovementState::Idle;
+		break;
+	case dae::MovementState::Dropping:
+		Drop();
 		break;
 	default:
 		break;

@@ -16,10 +16,16 @@ void dae::GameObject::Update()
 {
 	for (const auto& comp : m_pComponents)
 	{
-		const auto component = comp.get();
-		if (component)
+		if (comp.get())
 		{
-			component->Update();
+			comp->Update();
+		}
+	}
+	for (const auto& child : m_pChildren)
+	{
+		if (child.get())
+		{
+			child->Update();
 		}
 	}
 }
@@ -28,10 +34,16 @@ void dae::GameObject::LateUpdate()
 {
 	for (const auto& comp : m_pComponents)
 	{
-		const auto component = comp.get();
-		if (component)
+		if (comp.get())
 		{
-			component->LateUpdate();
+			comp->LateUpdate();
+		}
+	}
+	for (const auto& child : m_pChildren)
+	{
+		if (child.get())
+		{
+			child->LateUpdate();
 		}
 	}
 }
@@ -40,17 +52,28 @@ void dae::GameObject::Render() const
 {
 	for (const auto& comp : m_pComponents)
 	{
-		const auto component = comp.get();
-		if (component)
+		if (comp.get())
 		{
-			component->Render();
+			comp->Render();
+		}
+	}
+	for (const auto& child : m_pChildren)
+	{
+		if (child.get())
+		{
+			child->Render();
 		}
 	}
 }
 
+void dae::GameObject::MarkForDestroy()
+{
+	m_markedForDestroy = true;
+}
+
 bool dae::GameObject::MarkedForDestroy() const
 {
-	return m_MarkedForDestroy;
+	return m_markedForDestroy;
 }
 
 void dae::GameObject::SetParent(GameObject* pParent, bool keepWorldPos)
@@ -67,23 +90,28 @@ void dae::GameObject::SetParent(GameObject* pParent, bool keepWorldPos)
 
 	if (pParent == nullptr)
 	{
+		if (m_pParent == nullptr)
+		{
+			return;
+		}
 		SetLocalPosition(GetWorldPosition());
+		m_pScene->Add(m_pParent->RemoveChild(this));
 		m_pParent = nullptr;
 	}
 	else
 	{
-		if (keepWorldPos)
-		{
-			SetLocalPosition(GetLocalPosition() - m_pParent->GetWorldPosition());
-		}
-
 		if (m_pParent)
 		{
-			m_pParent->RemoveChild(this);
+			m_pScene->Add(pParent->RemoveChild(this));
 		}
 
 		m_pParent = pParent;
-		//m_pParent->AddChild(this);
+		m_pParent->AddChild(this);
+
+		if (keepWorldPos)
+		{
+			SetLocalPosition(GetLocalPosition() - pParent->GetWorldPosition());
+		}
 	}
 
 	SetPositionDirty();
@@ -106,14 +134,19 @@ int dae::GameObject::GetChildCount() const
 
 void dae::GameObject::AddChild(GameObject* pChild)
 {
-	m_pChildren.emplace_back(m_pScene->GetObject(pChild));
+	m_pChildren.push_back(m_pScene->GetObject(pChild));
 }
 
-void dae::GameObject::RemoveChild(GameObject* pChild)
+std::unique_ptr<dae::GameObject> dae::GameObject::RemoveChild(GameObject* pChild)
 {
-	m_pChildren.erase(std::remove_if(m_pChildren.begin(), m_pChildren.end(),
-		[&](const std::unique_ptr<GameObject>& ptr) { return ptr.get() == pChild; }),
-		m_pChildren.end());
+	auto it = std::find_if(m_pChildren.begin(), m_pChildren.end(), [&](const auto& children) { return children.get() == pChild; });
+	if (it != m_pChildren.end())
+	{
+		std::unique_ptr<GameObject> childToRemove(std::move(*it));
+		m_pChildren.erase(it);
+		return childToRemove;
+	}
+	return nullptr;
 }
 
 const glm::vec3& dae::GameObject::GetWorldPosition()

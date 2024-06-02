@@ -24,38 +24,56 @@ dae::SlickComponent::SlickComponent(dae::GameObject* pParent, dae::LevelComponen
 	}
 }
 
+
+
 void dae::SlickComponent::Update()
 {
 	if (m_pMoveComponent == nullptr)
 		return;
 
-	if (m_pMoveComponent->CheckDeath())
-	{
-		m_pMoveComponent->StartFalling();
-	}
-
 	bool moveLeft = false;
 
-	m_timer += TimeManager::GetInstance().GetDeltaTime();
-	if (m_timer < m_waitTime)
+	switch (m_pMoveComponent->GetCurrentState())
 	{
-		return;
-	}
-	m_timer = 0;
+	case MovementState::Idle:
+		
 
-	//Movement down pyramid
-	moveLeft = (rand() % 2) == 0;
+		m_timer += TimeManager::GetInstance().GetDeltaTime();
+		if (m_timer < m_waitTime)
+		{
+			return;
+		}
+		m_timer = 0;
 
-	if (moveLeft)
-	{
-		m_pMoveComponent->Move(glm::vec2(-1, -1));
-	}
-	else
-	{
-		m_pMoveComponent->Move(glm::vec2(1, -1));
-	}
+		//Movement down pyramid
+		moveLeft = (rand() % 2) == 0;
 
-	return;
+		if (moveLeft)
+		{
+			m_pMoveComponent->Move(glm::vec2(-1, -1));
+		}
+		else
+		{
+			m_pMoveComponent->Move(glm::vec2(1, -1));
+		}
+		break;
+	case MovementState::Arriving:
+		if (m_pMoveComponent->CheckDeath())
+		{
+			m_pMoveComponent->StartFalling();
+		}
+		else
+		{
+			ChangeBackBlock();
+		}
+		break;
+	default:
+		break;
+	}
 }
 
-
+void dae::SlickComponent::ChangeBackBlock()
+{
+	auto currentBlock = m_pMoveComponent->GetCurrentBlock();
+	m_pMoveComponent->GetLevel()->ChangeBlock(currentBlock->idx, currentBlock->textureIndex, true);
+}

@@ -33,13 +33,14 @@ std::unique_ptr<GameObject> dae::Scene::GetObject(GameObject* object)
 {
 	auto it = std::find_if(m_objects.begin(), m_objects.end(), [&](const std::unique_ptr<GameObject>& ptr)
 		{ return ptr.get() == object; });
-	std::unique_ptr<GameObject> pObject;
 
 	if (it != m_objects.end())
 	{
-		pObject = std::move(*it);
+		auto pObject = std::move(*it);
+		m_objects.erase(it);
+		return pObject;
 	}
-	return pObject;
+	return nullptr;
 
 }
 
@@ -55,7 +56,10 @@ void Scene::Update()
 {
 	for(auto& object : m_objects)
 	{
-		object->Update();
+		if (object != nullptr)
+		{
+			object->Update();
+		}
 	}
 }
 
@@ -65,14 +69,13 @@ void Scene::LateUpdate()
 	{
 		object->LateUpdate();
 	}
-	for (auto i{ m_objects.begin() }; i != m_objects.end(); ++i)
-	{
-		auto& element = *i;
-		if (element->MarkedForDestroy())
+	
+	m_objects.erase(std::remove_if(m_objects.begin(), m_objects.end(),
+		[](const std::unique_ptr<GameObject>& object)
 		{
-			m_objects.erase(i);
-		}
-	}
+			return object->MarkedForDestroy();
+		}),
+		m_objects.end());
 }
 
 void Scene::Render() const

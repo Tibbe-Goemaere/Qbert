@@ -21,11 +21,11 @@ namespace dae
 		MovePlayerComponent& operator=(MovePlayerComponent&& other) = delete;
 
 		void MovePlayer(const glm::vec2& direction);
+		void GetOffDisk();
 	private:
 		dae::ScoreComponent* m_pScoreComponent;
 		dae::HealthComponent* m_pHealthComponent;
-		bool m_hasMoved;
 		int m_entityIdx;
-		bool m_onDisk;
+		DiskComponent* m_pDisk;
 	};
 }

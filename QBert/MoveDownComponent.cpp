@@ -34,7 +34,7 @@ void dae::MoveDownComponent::Update()
 
 	bool moveLeft = false;
 
-	switch (m_currentState)
+	switch (GetCurrentState())
 	{
 	case dae::MovementState::Idle:
 		m_timer += TimeManager::GetInstance().GetDeltaTime();

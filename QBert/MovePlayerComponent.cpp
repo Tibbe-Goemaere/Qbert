@@ -6,20 +6,24 @@
 #include "HealthComponent.h"
 #include "ScoreComponent.h"
 #include "DiskComponent.h"
+#include <iostream>
 
 dae::MovePlayerComponent::MovePlayerComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed)
 	:MoveComponent::MoveComponent(pParent,pLevel, speed)
 	,m_pScoreComponent{ pParent->GetComponent<ScoreComponent>() }
 	,m_pHealthComponent{ pParent->GetComponent<HealthComponent>() }
-	,m_hasMoved{false}
-	,m_onDisk{false}
+	,m_pDisk{nullptr}
 {
 	m_entityIdx = pLevel->AddEntity(std::make_unique<Entity>(m_pCurrentBlock->row, m_pCurrentBlock->column,EntityType::Player));
 }
 
 void dae::MovePlayerComponent::MovePlayer(const glm::vec2& direction)
 {
-	if (m_onDisk)
+	if (m_pDisk != nullptr)
+	{
+		return;
+	}
+	if (m_pCurrentBlock == nullptr)
 	{
 		return;
 	}
@@ -37,23 +41,30 @@ void dae::MovePlayerComponent::MovePlayer(const glm::vec2& direction)
 
 	if (CheckDeath())
 	{
-		auto disk = GetLevel()->GetDisk(currentRow, currentColumn);
-		if (disk != nullptr)
-		{
-			m_onDisk = true;
-			disk->Activate();
-		}
+		m_pDisk = GetLevel()->GetDisk(currentRow, currentColumn);
 	}
 }
+
+void dae::MovePlayerComponent::GetOffDisk()
+{
+	m_pParent->SetParent(nullptr, true);
+	m_pDisk = nullptr;
+	DropOnLevel();
+}
+
 
 void dae::MovePlayerComponent::Update()
 {
 	MoveComponent::Update();
 
-	switch (m_currentState)
+	if (GetCurrentState() == MovementState::Arriving)
 	{
-	case dae::MovementState::Idle:
-		if (m_hasMoved && !m_onDisk)
+		if (m_pDisk != nullptr)
+		{
+			m_pParent->SetParent(m_pDisk->GetParent(), true);
+			m_pDisk->Activate();
+		}
+		else
 		{
 			if (CheckDeath())
 			{
@@ -72,22 +83,7 @@ void dae::MovePlayerComponent::Update()
 				const int colorChangePoints = 25;
 				m_pScoreComponent->AddScore(colorChangePoints);
 			}
-			m_hasMoved = false;
-
-			
 		}
-		break;
-	case dae::MovementState::Moving:
-		if (!m_hasMoved)
-		{
-			m_hasMoved = true;
-		}
-		break;
-	case dae::MovementState::Falling:
-		
-		break;
-	default:
-		break;
 	}
 }
 

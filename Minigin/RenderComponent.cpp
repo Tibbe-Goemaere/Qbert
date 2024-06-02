@@ -40,7 +40,7 @@ void dae::RenderComponent::SetTextTexture(std::shared_ptr<Texture2D> texture)
 
 void dae::RenderComponent::SetRenderTexture(bool renderTexture, int textureIndex)
 {
-	if (textureIndex < m_pTextures.size())
+	if (textureIndex < static_cast<int>(m_pTextures.size()))
 	{
 		m_pTextures[textureIndex].renderTexture = renderTexture;
 	}

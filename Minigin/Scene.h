@@ -4,6 +4,7 @@
 namespace dae
 {
 	class GameObject;
+	class EnemySpawner;
 
 	class Scene final
 	{

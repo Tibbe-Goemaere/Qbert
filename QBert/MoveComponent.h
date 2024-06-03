@@ -18,7 +18,7 @@ namespace dae
 	public:
 		virtual void Update() override;
 
-		MoveComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed = 150.f, int row = 0, int column = 0);
+		MoveComponent(dae::GameObject* pParent, LevelComponent* pLevel, int row = 0, int column = 0, float speed = 150.f);
 		virtual ~MoveComponent() = default;
 		MoveComponent(const MoveComponent& other) = delete;
 		MoveComponent(MoveComponent&& other) = delete;
@@ -29,7 +29,7 @@ namespace dae
 		Block* GetCurrentBlock() const;
 		dae::LevelComponent* GetLevel() const;
 		bool CheckDeath();
-		void StartFalling();
+		void StartFalling(glm::vec2 direction = {0,1});
 		void DropOnLevel();
 		MovementState GetCurrentState() const;
 
@@ -48,6 +48,7 @@ namespace dae
 		glm::vec3 m_startPosition;
 		glm::vec3 m_dropDirection;
 		std::pair<int, int> m_startGridPos;
+		glm::vec2 m_fallDirection;
 
 		void Fall();
 		void Drop();

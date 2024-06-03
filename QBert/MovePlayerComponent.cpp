@@ -9,7 +9,7 @@
 #include <iostream>
 
 dae::MovePlayerComponent::MovePlayerComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed)
-	:MoveComponent::MoveComponent(pParent,pLevel, speed)
+	:MoveComponent::MoveComponent(pParent,pLevel, 0,0,speed)
 	,m_pScoreComponent{ pParent->GetComponent<ScoreComponent>() }
 	,m_pHealthComponent{ pParent->GetComponent<HealthComponent>() }
 	,m_pDisk{nullptr}

@@ -3,7 +3,7 @@
 #include "TimeManager.h"
 #include "CostumCommands.h"
 
-dae::MoveComponent::MoveComponent(dae::GameObject* pParent, LevelComponent* pLevel, float speed, int row, int column)
+dae::MoveComponent::MoveComponent(dae::GameObject* pParent, LevelComponent* pLevel, int row, int column, float speed)
 	:BaseComponent::BaseComponent(pParent)
 	,m_pLevel{ pLevel }
 	,m_currentState{MovementState::Idle}
@@ -11,6 +11,7 @@ dae::MoveComponent::MoveComponent(dae::GameObject* pParent, LevelComponent* pLev
 	,m_speed{speed}
 	,m_dropDirection{}
 	,m_startGridPos{std::make_pair(row,column)}
+	,m_fallDirection{0,1}
 {
 	m_pCurrentBlock = pLevel->GetBlock(row, column);
 
@@ -36,9 +37,19 @@ bool dae::MoveComponent::Move(const glm::vec2& direction, float)
 	int row = m_pCurrentBlock->row;
 	int column = m_pCurrentBlock->column;
 
-	GetNextRowColumn(row, column, direction);
+	glm::normalize(direction);
 
-	m_targetPosition = { pos.x + (m_blockSize / 2.f) * direction.x ,pos.y + (m_blockSize * 3.f / 4.f) * (direction.y * -1),pos.z };
+	//Handle movement for Ugg
+	if (direction.y == 0)
+	{
+		column += static_cast<int>(direction.x);
+		m_targetPosition = { pos.x + m_blockSize * direction.x ,pos.y ,pos.z };
+	}
+	else
+	{
+		GetNextRowColumn(row, column, direction);
+		m_targetPosition = { pos.x + (m_blockSize / 2.f) * direction.x ,pos.y + (m_blockSize * 3.f / 4.f) * (direction.y * -1),pos.z };
+	}
 
 	m_pCurrentBlock = m_pLevel->GetBlock(row, column);
 
@@ -65,10 +76,11 @@ bool dae::MoveComponent::CheckDeath()
 	return false;
 }
 
-void dae::MoveComponent::StartFalling()
+void dae::MoveComponent::StartFalling(glm::vec2 direction)
 {
 	m_currentState = MovementState::Falling;
 	m_pParent->SetRenderLayer(-1);
+	m_fallDirection = glm::normalize(glm::vec2{ direction.x,direction.y * -1 });
 }
 
 void dae::MoveComponent::DropOnLevel()
@@ -88,7 +100,6 @@ void dae::MoveComponent::GetNextRowColumn(int& row, int& column, const glm::vec2
 	int dirX = static_cast<int>(dir.x);
 	int dirY = static_cast<int>(dir.y);
 
-
 	row += (dirY * -1);
 	if (dirX == 1 && dirY == -1)
 	{
@@ -104,7 +115,7 @@ void dae::MoveComponent::Fall()
 {
 	const float fallSpeed = 550.f;
 	auto pos = m_pParent->GetLocalPosition();
-	pos = glm::vec3(pos.x, pos.y + fallSpeed * dae::TimeManager::GetInstance().GetDeltaTime(), pos.z);
+	pos += fallSpeed * dae::TimeManager::GetInstance().GetDeltaTime() * glm::vec3{ m_fallDirection.x, m_fallDirection.y, 0 };
 	m_pParent->SetLocalPosition(pos);
 }
 

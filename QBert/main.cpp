@@ -28,6 +28,7 @@
 #include "SlickComponent.h"
 #include "EnemySpawner.h"
 #include "UpdateManager.h"
+#include "UggComponent.h"
 
 using namespace dae;
 
@@ -88,12 +89,12 @@ void load()
 	
 	coily->AddComponent<dae::CoilyComponent>(level1Component);
 	
-	scene.Add(std::move(coily));
+	//scene.Add(std::move(coily));
 
 	//Slick
 	auto slick = std::make_unique<dae::GameObject>();
 	slick->AddComponent<dae::SlickComponent>(level1Component,"Sprites/Slick.png");
-	scene.Add(std::move(slick));
+	//scene.Add(std::move(slick));
 
 	//Qbert Commands
 	auto upLeftQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(1,1));
@@ -125,9 +126,14 @@ void load()
 
 	//Update manager + enemyspawner
 	auto pEnemySpawner = std::make_unique<EnemySpawner>(level1Component,scene);
-	auto spawnInfo = std::make_unique<SpawnInfo>(EnemyType::Coily, 10.f, 20.f, 5.f);
-	pEnemySpawner->AddSpawn(std::move(spawnInfo));
+	//auto spawnInfo = std::make_unique<SpawnInfo>(EnemyType::Coily, 10.f, 20.f, 5.f);
+	//pEnemySpawner->AddSpawn(std::move(spawnInfo));
 	UpdateManager::GetInstance().AddUpdater(std::move(pEnemySpawner));
+
+	//Ugg
+	auto ugg = std::make_unique<dae::GameObject>();
+	ugg->AddComponent<dae::UggComponent>(level1Component,"Sprites/Ugg.png",true);
+	scene.Add(std::move(ugg));
 }
 
 int main(int, char* [])

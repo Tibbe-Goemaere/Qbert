@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <memory>
+#include "ObjectUpdater.h"
 
 namespace dae
 {
@@ -23,9 +24,14 @@ namespace dae
 		float timeIntervalMin;
 		float timeIntervalMax;
 		float startTime;
+
+		// Constructor to initialize the struct members
+		SpawnInfo(EnemyType type, float minInterval, float maxInterval, float start)
+			: enemyType(type), timeIntervalMin(minInterval), timeIntervalMax(maxInterval), startTime(start)
+		{}
 	};
 
-	class  EnemySpawner final
+	class EnemySpawner final : public ObjectUpdater
 	{
 	private:
 		struct Spawn
@@ -37,9 +43,9 @@ namespace dae
 		};
 
 	public:
-		void Update();
+		void Update() override;
 
-		EnemySpawner(LevelComponent* pLevel, Scene* pScene);
+		EnemySpawner(LevelComponent* pLevel, Scene& scene);
 		virtual ~EnemySpawner() = default;
 		EnemySpawner(const EnemySpawner& other) = delete;
 		EnemySpawner(EnemySpawner&& other) = delete;
@@ -53,7 +59,7 @@ namespace dae
 		float m_totalTime;
 		std::vector<std::unique_ptr<Spawn>> m_pSpawns;
 		LevelComponent* m_pLevel;
-		Scene* m_pScene;
+		Scene& m_scene;
 
 		void SpawnEnemy(EnemyType enemyType);
 		float GenerateRandomFloat(float min, float max);

@@ -6,12 +6,13 @@
 #include "CoilyComponent.h"
 #include "SlickComponent.h"
 #include "Scene.h"
+#include "SceneManager.h"
 
-dae::EnemySpawner::EnemySpawner(LevelComponent* pLevel, Scene* pScene)
+dae::EnemySpawner::EnemySpawner(LevelComponent* pLevel, Scene& scene)
 	:m_totalTime{0.f}
 	,m_pSpawns{}
 	,m_pLevel{pLevel}
-	,m_pScene{pScene}
+	,m_scene{scene}
 {
 }
 
@@ -72,7 +73,7 @@ void dae::EnemySpawner::SpawnEnemy(EnemyType enemyType)
 	default:
 		break;
 	}
-	m_pScene->Add(std::move(pEnemyObject));
+	m_scene.Add(std::move(pEnemyObject));
 }
 
 float dae::EnemySpawner::GenerateRandomFloat(float min, float max)

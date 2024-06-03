@@ -39,9 +39,6 @@
     <ClCompile Include="CostumGameObjects.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MoveDownComponent.cpp">
-      <Filter>Source Files\Components</Filter>
-    </ClCompile>
     <ClCompile Include="CoilyComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
@@ -73,9 +70,6 @@
     </ClInclude>
     <ClInclude Include="CostumGameObjects.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MoveDownComponent.h">
-      <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="CoilyComponent.h">
       <Filter>Header Files\Components</Filter>

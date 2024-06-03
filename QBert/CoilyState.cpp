@@ -3,10 +3,6 @@
 #include "MoveComponent.h"
 #include "TimeManager.h"
 
-std::unique_ptr<dae::CoilyState> dae::CoilyState::EggState = std::make_unique<dae::EggState>();
-std::unique_ptr<dae::CoilyState> dae::CoilyState::SnakeState = std::make_unique<dae::SnakeState>();
-std::unique_ptr<dae::CoilyState> dae::CoilyState::DyingState = std::make_unique<dae::DyingState>();
-
 dae::EggState::EggState()
 	:m_timer{ 0 }
 	,m_waitTime{ 1.f }
@@ -34,7 +30,7 @@ std::unique_ptr<dae::CoilyState> dae::EggState::Update(CoilyComponent* )
 	{
 		if (pBlock->row == (m_pMoveComponent->GetLevel()->GetAmountOfLayers() - 1))
 		{
-			return std::move(CoilyState::SnakeState);
+			return std::move(std::make_unique<dae::SnakeState>());
 		}
 	}
 
@@ -86,7 +82,7 @@ std::unique_ptr<dae::CoilyState> dae::SnakeState::Update(CoilyComponent*)
 
 	if (m_pMoveComponent->CheckDeath())
 	{
-		return std::move(CoilyState::DyingState);
+		return std::move(std::make_unique<dae::DyingState>());
 	}
 
 	m_pMoveComponent->Move(FindNextBlock());

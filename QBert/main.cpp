@@ -23,10 +23,11 @@
 #include "MovePlayerComponent.h"
 #include "CostumCommands.h"
 #include "SoundSystem.h"
-#include "MoveDownComponent.h"
 #include "CoilyComponent.h"
 #include "DiskComponent.h"
 #include "SlickComponent.h"
+#include "EnemySpawner.h"
+#include "UpdateManager.h"
 
 using namespace dae;
 
@@ -84,12 +85,7 @@ void load()
 
 	//Coily
 	auto coily = std::make_unique<dae::GameObject>();
-
-	//RenderComponent
-	auto renderCoily = coily->AddComponent<dae::RenderComponent>();
-	renderCoily->SetTexture("Sprites/CoilyEgg.png");
-
-	//Movemement
+	
 	coily->AddComponent<dae::CoilyComponent>(level1Component);
 	
 	scene.Add(std::move(coily));
@@ -126,6 +122,12 @@ void load()
 		, font);
 	go->SetLocalPosition(glm::vec3(10, 440, 0));
 	scene.Add(std::move(go));
+
+	//Update manager + enemyspawner
+	auto pEnemySpawner = std::make_unique<EnemySpawner>(level1Component,scene);
+	auto spawnInfo = std::make_unique<SpawnInfo>(EnemyType::Coily, 10.f, 20.f, 5.f);
+	pEnemySpawner->AddSpawn(std::move(spawnInfo));
+	UpdateManager::GetInstance().AddUpdater(std::move(pEnemySpawner));
 }
 
 int main(int, char* [])

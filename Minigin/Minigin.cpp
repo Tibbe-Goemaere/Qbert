@@ -16,6 +16,7 @@
 #include "SoundSystem.h"
 #include <cstdlib> 
 #include <ctime>   
+#include "UpdateManager.h"
 
 SDL_Window* g_window{};
 
@@ -103,6 +104,7 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	auto& renderer = Renderer::GetInstance();
 	auto& sceneManager = SceneManager::GetInstance();
 	auto& input = InputManager::GetInstance();
+	auto& updater = UpdateManager::GetInstance();
 
 	const float targetFps = 60.f;
 	const int msPerFrame = static_cast<const int>(1000.f / targetFps);
@@ -120,6 +122,7 @@ void dae::Minigin::Run(const std::function<void()>& load)
 
 		doContinue = input.ProcessInput();
 		sceneManager.Update();
+		updater.Update();
 		sceneManager.LateUpdate();
 		renderer.Render();
 		

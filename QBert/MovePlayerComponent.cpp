@@ -13,6 +13,7 @@ dae::MovePlayerComponent::MovePlayerComponent(dae::GameObject* pParent, LevelCom
 	,m_pScoreComponent{ pParent->GetComponent<ScoreComponent>() }
 	,m_pHealthComponent{ pParent->GetComponent<HealthComponent>() }
 	,m_pDisk{nullptr}
+	,m_justDropped{false}
 {
 	m_entityIdx = pLevel->AddEntity(std::make_unique<Entity>(m_pCurrentBlock->row, m_pCurrentBlock->column,EntityType::Player));
 }
@@ -50,6 +51,7 @@ void dae::MovePlayerComponent::GetOffDisk()
 	m_pParent->SetParent(nullptr, true);
 	m_pDisk = nullptr;
 	DropOnLevel();
+	m_justDropped = true;
 }
 
 
@@ -58,7 +60,7 @@ void dae::MovePlayerComponent::Update()
 	MoveComponent::Update();
 
 	if (GetCurrentState() == MovementState::Arriving)
-	{
+	{	
 		if (m_pDisk != nullptr)
 		{
 			m_pParent->SetParent(m_pDisk->GetParent(), true);
@@ -78,6 +80,12 @@ void dae::MovePlayerComponent::Update()
 				return;
 			}
 
+			if (m_justDropped)
+			{
+				m_pLevel->UpdateEntity(m_entityIdx, m_pCurrentBlock->row, m_pCurrentBlock->column);
+				m_justDropped = false;
+			}
+			
 			if (m_pLevel->ChangeBlock(m_pCurrentBlock->idx, m_pCurrentBlock->textureIndex) && m_pScoreComponent)
 			{
 				const int colorChangePoints = 25;

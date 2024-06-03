@@ -8,7 +8,7 @@
 dae::DiskComponent::DiskComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel, bool isOnLeftSide, int rowNr)
 	:BaseComponent::BaseComponent(pParent)
 	,m_pLevelComponent{pLevel}
-	,m_speed{1.f}
+	,m_speed{0.5f}
 	,m_pRenderComponent{ pParent->GetComponent<RenderComponent>() }
 	,m_activated{false}
 	,m_targetPosition{}

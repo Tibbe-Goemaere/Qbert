@@ -110,17 +110,17 @@ glm::vec2 dae::SnakeState::FindNextBlock() const
 	auto block = m_pMoveComponent->GetCurrentBlock();
 	auto entity = level->GetEntity(EntityType::Player);
 
-	int rowDifference = std::abs(block->row - entity->row) - 1;
+	float rowDifference = static_cast<float>(std::abs(block->row - entity->row)) - 0.5f;
+	float myCol = static_cast<float>(block->column);
+	float entityCol = static_cast<float>(entity->column);
 	glm::vec2 direction(0, 1);
 
 	if (block->row < entity->row)
 	{
+		//Go down
 		direction.y = -1;
-	}
-	if (block->row < entity->row)
-	{
-		direction.y = -1;
-		if (entity->column > block->column + rowDifference)
+		//Decide horizontal movement
+		if (entityCol > myCol + rowDifference)
 		{
 			direction.x = 1;
 		}
@@ -131,8 +131,10 @@ glm::vec2 dae::SnakeState::FindNextBlock() const
 	}
 	else if (block->row > entity->row)
 	{
+		//Go up
 		direction.y = 1;
-		if (entity->column >= block->column - rowDifference)
+		//Decide horizontal movement
+		if (entityCol >= myCol - rowDifference)
 		{
 			direction.x = 1;
 		}
@@ -143,15 +145,7 @@ glm::vec2 dae::SnakeState::FindNextBlock() const
 	}
 	else
 	{
-		if (block->row == (level->GetAmountOfLayers() - 1))
-		{
-			direction.y = 1;
-		}
-		else
-		{
-			direction.y = -1;
-		}
-
+		//If at same height just go left or right based on where you are
 		if (entity->column > block->column)
 		{
 			direction.x = 1;
@@ -160,6 +154,29 @@ glm::vec2 dae::SnakeState::FindNextBlock() const
 		{
 			direction.x = -1;
 		}
+	}
+
+	bool isNotInJumpDistance = std::abs(entity->row - block->row) != 1;
+	//If at bottom always go up
+	if (block->row == (level->GetAmountOfLayers() - 1))
+	{
+		direction.y = 1;
+	}
+	//If at top always go down
+	if (block->row == 0 && isNotInJumpDistance)
+	{
+		direction.y = -1;
+	}
+
+	//If at the far right edge only jump off when its after chasing qbert
+	if (block->row == block->column && isNotInJumpDistance)
+	{
+		direction.x = -1;
+	}
+	//If at the left side edge only jump off when its after chasing qbert
+	if (0 == block->column && isNotInJumpDistance)
+	{
+		direction.x = 1;
 	}
 
 	return direction;

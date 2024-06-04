@@ -189,6 +189,7 @@ xcopy "$(SolutionDir)Data" "$(SolutionDir)$(PlatformTarget)\Data\" /I /E /Y</Com
   <ItemGroup>
     <ClCompile Include="CoilyComponent.cpp" />
     <ClCompile Include="CoilyState.cpp" />
+    <ClCompile Include="CollisionComponent.cpp" />
     <ClCompile Include="CostumCommands.cpp" />
     <ClCompile Include="DiskComponent.cpp" />
     <ClCompile Include="EnemySpawner.cpp" />
@@ -203,6 +204,7 @@ xcopy "$(SolutionDir)Data" "$(SolutionDir)$(PlatformTarget)\Data\" /I /E /Y</Com
   <ItemGroup>
     <ClInclude Include="CoilyComponent.h" />
     <ClInclude Include="CoilyState.h" />
+    <ClInclude Include="CollisionComponent.h" />
     <ClInclude Include="CostumCommands.h" />
     <ClInclude Include="DiskComponent.h" />
     <ClInclude Include="EnemySpawner.h" />

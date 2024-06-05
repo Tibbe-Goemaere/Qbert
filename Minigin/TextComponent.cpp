@@ -11,37 +11,19 @@ dae::TextComponent::TextComponent(GameObject* pParent, const std::string& text, 
 	, BaseComponent::BaseComponent(pParent)
 { 
 	m_pRenderComponent = BaseComponent::m_pParent->GetComponent<RenderComponent>();
+	MakeTextTexture();
 }
 
 void dae::TextComponent::Awake()
 {
-	//m_pRenderComponent = BaseComponent::m_pParent->GetComponent<RenderComponent>();
+	
 }
 
 void dae::TextComponent::Update()
 {
 	if (m_needsUpdate)
 	{
-		const SDL_Color color = { 255,255,255,255 }; // only white text is supported now
-		const auto surf = TTF_RenderText_Blended(m_font->GetFont(), m_text.c_str(), color);
-		if (surf == nullptr) 
-		{
-			throw std::runtime_error(std::string("Render text failed: ") + SDL_GetError());
-		}
-		auto texture = SDL_CreateTextureFromSurface(Renderer::GetInstance().GetSDLRenderer(), surf);
-		if (texture == nullptr) 
-		{
-			throw std::runtime_error(std::string("Create text texture from surface failed: ") + SDL_GetError());
-		}
-		SDL_FreeSurface(surf);
-		m_textTexture = std::make_shared<Texture2D>(texture);
-		m_needsUpdate = false;
-
-		//auto renderComponent = BaseComponent::m_pParent->GetComponent<RenderComponent>();
-		if (m_pRenderComponent)
-		{
-			m_pRenderComponent->SetTextTexture(m_textTexture);
-		}
+		MakeTextTexture();
 	}
 }
 
@@ -52,5 +34,27 @@ void dae::TextComponent::SetText(const std::string& text)
 	m_needsUpdate = true;
 }
 
+void dae::TextComponent::MakeTextTexture()
+{
+	const SDL_Color color = { 255,255,255,255 }; // only white text is supported now
+	const auto surf = TTF_RenderText_Blended(m_font->GetFont(), m_text.c_str(), color);
+	if (surf == nullptr)
+	{
+		throw std::runtime_error(std::string("Render text failed: ") + SDL_GetError());
+	}
+	auto texture = SDL_CreateTextureFromSurface(Renderer::GetInstance().GetSDLRenderer(), surf);
+	if (texture == nullptr)
+	{
+		throw std::runtime_error(std::string("Create text texture from surface failed: ") + SDL_GetError());
+	}
+	SDL_FreeSurface(surf);
+	m_textTexture = std::make_shared<Texture2D>(texture);
+	m_needsUpdate = false;
+
+	if (m_pRenderComponent)
+	{
+		m_pRenderComponent->SetTextTexture(m_textTexture);
+	}
+}
 
 

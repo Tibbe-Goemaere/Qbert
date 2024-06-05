@@ -33,7 +33,7 @@
     <ClCompile Include="MoveComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="MovePlayerComponent.cpp">
+    <ClCompile Include="QbertComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="CostumGameObjects.cpp">
@@ -60,6 +60,9 @@
     <ClCompile Include="CollisionComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
+    <ClCompile Include="GameManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CostumCommands.h">
@@ -71,7 +74,7 @@
     <ClInclude Include="MoveComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="MovePlayerComponent.h">
+    <ClInclude Include="QbertComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="CostumGameObjects.h">
@@ -97,6 +100,12 @@
     </ClInclude>
     <ClInclude Include="CollisionComponent.h">
       <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameIncludes.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

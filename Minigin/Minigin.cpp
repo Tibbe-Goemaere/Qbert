@@ -54,6 +54,7 @@ void PrintSDLVersion()
 }
 
 dae::Minigin::Minigin(const std::string &dataPath)
+	:m_windowSize{640.f,480.f}
 {
 	PrintSDLVersion();
 	
@@ -71,8 +72,8 @@ dae::Minigin::Minigin(const std::string &dataPath)
 		"Programming 4 assignment",
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		640,
-		480,
+		static_cast<int>(m_windowSize.x),
+		static_cast<int>(m_windowSize.y),
 		SDL_WINDOW_OPENGL
 	);
 	if (g_window == nullptr) 
@@ -129,4 +130,9 @@ void dae::Minigin::Run(const std::function<void()>& load)
 		const auto sleepTime = currentTime + std::chrono::milliseconds(msPerFrame) - std::chrono::high_resolution_clock::now();
 		std::this_thread::sleep_for(sleepTime);
 	}
+}
+
+glm::vec2 dae::Minigin::GetWindowSize()
+{
+	return m_windowSize;
 }

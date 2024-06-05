@@ -10,42 +10,54 @@ dae::EggState::EggState()
 {
 }
 
-std::unique_ptr<dae::CoilyState> dae::EggState::Update(CoilyComponent* )
+std::unique_ptr<dae::CoilyState> dae::EggState::Update(CoilyComponent* coily)
 {
 	if (m_pMoveComponent == nullptr)
 		return nullptr;
 
-	bool moveLeft = false;
-
-	m_timer += TimeManager::GetInstance().GetDeltaTime();
-	if (m_timer < m_waitTime)
+	switch (m_pMoveComponent->GetCurrentState())
 	{
-		return nullptr;
-	}
-	m_timer = 0;
-
-	auto pBlock = m_pMoveComponent->GetCurrentBlock();
-
-	if (pBlock != nullptr)
+	case MovementState::Idle:
 	{
-		if (pBlock->row == (m_pMoveComponent->GetLevel()->GetAmountOfLayers() - 1))
+		bool moveLeft = false;
+
+		m_timer += TimeManager::GetInstance().GetDeltaTime();
+		if (m_timer < m_waitTime)
 		{
-			return std::move(std::make_unique<dae::SnakeState>());
+			return nullptr;
 		}
-	}
+		m_timer = 0;
 
-	//Movement down pyramid
-	moveLeft = (rand() % 2) == 0;
+		auto pBlock = m_pMoveComponent->GetCurrentBlock();
 
-	if (moveLeft)
-	{
-		m_pMoveComponent->Move(glm::vec2(-1, -1));
+		if (pBlock != nullptr)
+		{
+			if (pBlock->row == (m_pMoveComponent->GetLevel()->GetAmountOfLayers() - 1))
+			{
+				return std::move(std::make_unique<dae::SnakeState>());
+			}
+		}
+
+		//Movement down pyramid
+		moveLeft = (rand() % 2) == 0;
+
+		if (moveLeft)
+		{
+			m_pMoveComponent->Move(glm::vec2(-1, -1));
+		}
+		else
+		{
+			m_pMoveComponent->Move(glm::vec2(1, -1));
+		}
+		break;
 	}
-	else
-	{
-		m_pMoveComponent->Move(glm::vec2(1, -1));
+	case MovementState::Arriving:
+		m_pMoveComponent->UpdateEntity(m_pMoveComponent->GetCurrentBlock()->row, m_pMoveComponent->GetCurrentBlock()->column);
+		coily->CheckCollision();
+		break;
+	default:
+		break;
 	}
-		
 	return nullptr;
 }
 

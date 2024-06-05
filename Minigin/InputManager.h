@@ -4,6 +4,7 @@
 #include <vector>
 #include "Controller.h"
 #include "Command.h"
+#include "SDL.h"
 
 namespace dae
 {

@@ -29,6 +29,7 @@ namespace dae
 
 		glm::vec2 GetTextureSize(const std::string& filename = "") const;
 		glm::vec2 GetTextureSizeViaIdx(int textureIdx = 0) const;
+		glm::vec2 GetTextTextureSize() const;
 
 		RenderComponent(GameObject* pParent);
 		virtual ~RenderComponent() = default;

@@ -96,11 +96,35 @@ dae::Entity* dae::LevelComponent::GetEntity(EntityType entityType) const
 	return nullptr;
 }
 
+dae::Entity* dae::LevelComponent::GetEntityByIdx(int entityIdx) const
+{
+	return m_pEntities[entityIdx].get();
+}
+
 void dae::LevelComponent::UpdateEntity(int entityIdx, int row, int column)
 {
 	auto pEntity = m_pEntities[entityIdx].get();
 	pEntity->row = row;
 	pEntity->column = column;
+}
+
+std::vector<dae::Entity*> dae::LevelComponent::LookForEntities(int entityIdx)
+{
+	auto pEntity = m_pEntities[entityIdx].get();
+	int row = pEntity->row;
+	int col = pEntity->column;
+
+	std::vector<Entity*> m_pOtherEntitiesOnBlock;
+
+	for (const auto& entity : m_pEntities)
+	{
+		if (entity.get() != pEntity && entity->row == row && entity->column == col)
+		{
+			m_pOtherEntitiesOnBlock.push_back(entity.get());
+		}
+	}
+
+	return m_pOtherEntitiesOnBlock;
 }
 
 void dae::LevelComponent::AddDisk(dae::DiskComponent* pDiskComponent)

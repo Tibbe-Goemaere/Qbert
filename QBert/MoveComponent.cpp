@@ -3,7 +3,7 @@
 #include "TimeManager.h"
 #include "CostumCommands.h"
 
-dae::MoveComponent::MoveComponent(dae::GameObject* pParent, LevelComponent* pLevel, int row, int column, float speed)
+dae::MoveComponent::MoveComponent(dae::GameObject* pParent, LevelComponent* pLevel, EntityType eType, int row, int column, float speed)
 	:BaseComponent::BaseComponent(pParent)
 	,m_pLevel{ pLevel }
 	,m_currentState{MovementState::Idle}
@@ -23,6 +23,9 @@ dae::MoveComponent::MoveComponent(dae::GameObject* pParent, LevelComponent* pLev
 
 	m_startPosition = glm::vec3(pos.x + m_blockSize / 2.f - textureSize.x / 2.f, pos.y - textureSize.y / 2.f, 0);
 	pParent->SetLocalPosition(m_startPosition);
+
+	auto newEntity = std::make_unique<dae::Entity>(row, column, eType,pParent);
+	m_entityIdx = pLevel->AddEntity(std::move(newEntity));
 }
 
 bool dae::MoveComponent::Move(const glm::vec2& direction, float)
@@ -95,6 +98,16 @@ dae::MovementState dae::MoveComponent::GetCurrentState() const
 	return m_currentState;
 }
 
+void dae::MoveComponent::UpdateEntity(int row, int col)
+{
+	m_pLevel->UpdateEntity(m_entityIdx, row, col);
+}
+
+int dae::MoveComponent::GetEntityIdx() const
+{
+	return m_entityIdx;
+}
+
 void dae::MoveComponent::GetNextRowColumn(int& row, int& column, const glm::vec2& dir)
 {
 	int dirX = static_cast<int>(dir.x);
@@ -132,7 +145,7 @@ void dae::MoveComponent::Drop()
 	{
 		m_pParent->SetLocalPosition(m_startPosition);
 		m_pCurrentBlock = m_pLevel->GetBlock(m_startGridPos.first, m_startGridPos.second);
-		m_currentState = MovementState::Arriving;
+		m_currentState = MovementState::Idle;
 	}
 }
 
@@ -166,6 +179,7 @@ void dae::MoveComponent::Update()
 		Fall();
 		break;
 	case dae::MovementState::Arriving:
+		
 		m_currentState = MovementState::Idle;
 		break;
 	case dae::MovementState::Dropping:

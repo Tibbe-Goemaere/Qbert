@@ -20,7 +20,7 @@
 #include "ScoreComponent.h"
 #include "ScoreDisplayComponent.h"
 #include "LevelComponent.h"
-#include "MovePlayerComponent.h"
+#include "QbertComponent.h"
 #include "CostumCommands.h"
 #include "SoundSystem.h"
 #include "CoilyComponent.h"
@@ -30,11 +30,17 @@
 #include "UpdateManager.h"
 #include "UggComponent.h"
 
+#include "GameManager.h"
+
 using namespace dae;
 
-void load()
+void load(glm::vec2 windowSize)
 {
 	SoundLocater::RegisterSoundSystem(std::make_unique<SdlSoundSystem>());
+
+	auto gameManager = std::make_unique<GameManager>(windowSize);
+	
+	/*
 	auto font = dae::ResourceManager::GetInstance().LoadFont("Fonts/Lingua.otf", 18);
 
 	auto& scene = dae::SceneManager::GetInstance().CreateScene("Level1");
@@ -80,7 +86,7 @@ void load()
 	qbert->AddComponent<dae::HealthDisplayComponent>(livesText);
 
 	//Movemement
-	qbert->AddComponent<dae::MovePlayerComponent>(level1Component);
+	qbert->AddComponent<dae::QbertComponent>(level1Component);
 
 	auto pQbert = scene.Add(std::move(qbert));
 
@@ -94,7 +100,7 @@ void load()
 	//Slick
 	auto slick = std::make_unique<dae::GameObject>();
 	slick->AddComponent<dae::SlickComponent>(level1Component,"Sprites/Slick.png");
-	//scene.Add(std::move(slick));
+	scene.Add(std::move(slick));
 
 	//Qbert Commands
 	auto upLeftQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(1,1));
@@ -134,11 +140,13 @@ void load()
 	auto ugg = std::make_unique<dae::GameObject>();
 	ugg->AddComponent<dae::UggComponent>(level1Component,"Sprites/Ugg.png",true);
 	scene.Add(std::move(ugg));
+	*/
 }
 
 int main(int, char* [])
 {
 	dae::Minigin engine("../Data/");
-	engine.Run(load);
+	auto windowSize = engine.GetWindowSize();
+	engine.Run([&]() { load(windowSize); });
 	return 0;
 }

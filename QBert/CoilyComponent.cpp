@@ -3,6 +3,7 @@
 #include "MoveComponent.h"
 #include "RenderComponent.h"
 #include "LevelComponent.h"
+#include "CollisionComponent.h"
 
 
 dae::CoilyComponent::CoilyComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel)
@@ -19,8 +20,15 @@ dae::CoilyComponent::CoilyComponent(dae::GameObject* pParent, dae::LevelComponen
 	m_pMoveComponent = pParent->GetComponent<MoveComponent>();
 	if (m_pMoveComponent == nullptr)
 	{
-		m_pMoveComponent = pParent->AddComponent<MoveComponent>(pLevel);
+		m_pMoveComponent = pParent->AddComponent<MoveComponent>(pLevel,EntityType::PurpleEnemy);
 	}
+
+	m_pCollision = pParent->GetComponent<CollisionComponent>();
+	if (m_pCollision == nullptr)
+	{
+		m_pCollision = pParent->AddComponent<CollisionComponent>(pLevel);
+	}
+	m_pCollision->GetSubject()->AddObserver(this);
 
 	m_pCoilyState->OnEnter(this);
 }
@@ -39,4 +47,20 @@ void dae::CoilyComponent::Update()
 dae::GameObject* dae::CoilyComponent::GetParent() const
 {
 	return m_pParent;
+}
+
+void dae::CoilyComponent::Notify(dae::Event e, const GameObject*)
+{
+	switch (e)
+	{
+	case dae::Event::PlayerDies:
+		break;
+	default:
+		break;
+	}
+}
+
+void dae::CoilyComponent::CheckCollision()
+{
+	m_pCollision->CheckCollision(m_pMoveComponent->GetEntityIdx());
 }

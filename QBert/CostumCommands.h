@@ -4,7 +4,7 @@
 namespace dae
 {
 	class GameObject;
-	class MovePlayerComponent;
+	class QbertComponent;
 
 	enum class Direction
 	{
@@ -23,7 +23,7 @@ namespace dae
 	private:
 		dae::GameObject* m_pGameObject;
 		const glm::vec2 m_direction;
-		dae::MovePlayerComponent* m_pPlayerMovement;
+		dae::QbertComponent* m_pPlayerMovement;
 	};
 }
 

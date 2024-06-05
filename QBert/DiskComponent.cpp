@@ -3,7 +3,7 @@
 #include "LevelComponent.h"
 #include "RenderComponent.h"
 #include "TimeManager.h"
-#include "MovePlayerComponent.h"
+#include "QbertComponent.h"
 
 dae::DiskComponent::DiskComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel, bool isOnLeftSide, int rowNr)
 	:BaseComponent::BaseComponent(pParent)
@@ -53,7 +53,7 @@ void dae::DiskComponent::Update()
 			m_pParent->SetLocalPosition(m_targetPosition);
 			m_activated = false;
 			auto qbert = m_pParent->GetChildAt(0);
-			auto movement = qbert->GetComponent<dae::MovePlayerComponent>();
+			auto movement = qbert->GetComponent<dae::QbertComponent>();
 			if (movement)
 			{
 				movement->GetOffDisk();

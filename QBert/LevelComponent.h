@@ -41,6 +41,13 @@ namespace dae
 		int row;
 		int column;
 		EntityType entityType = EntityType::None;
+		GameObject* pObject;
+		Entity(int row ,int col, EntityType eType, GameObject* object)
+			:row{row}
+			,column{col}
+			,entityType{eType}
+			,pObject{object}
+		{}
 	};
 
 	class LevelComponent final : public BaseComponent
@@ -65,7 +72,9 @@ namespace dae
 		//Handling Entities
 		int AddEntity(std::unique_ptr<Entity> pNewEntity);
 		Entity* GetEntity(EntityType entityType) const;
+		Entity* GetEntityByIdx(int  entityIdx) const;
 		void UpdateEntity(int entityIdx, int row, int column);
+		std::vector<dae::Entity*> LookForEntities(int entityIdx);
 
 		//Handling Disks
 		void AddDisk(DiskComponent* pDiskComponent);
@@ -86,7 +95,7 @@ namespace dae
 		void LoadLevel(const std::string& filename);
 		void WriteLevel(const std::string& filename, XmlLevelInfo info);
 
-		 
+		
 	};
 
 	

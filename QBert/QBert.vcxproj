@@ -194,9 +194,10 @@ xcopy "$(SolutionDir)Data" "$(SolutionDir)$(PlatformTarget)\Data\" /I /E /Y</Com
     <ClCompile Include="DiskComponent.cpp" />
     <ClCompile Include="EnemySpawner.cpp" />
     <ClCompile Include="LevelComponent.cpp" />
+    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoveComponent.cpp" />
-    <ClCompile Include="MovePlayerComponent.cpp" />
+    <ClCompile Include="QbertComponent.cpp" />
     <ClCompile Include="CostumGameObjects.cpp" />
     <ClCompile Include="SlickComponent.cpp" />
     <ClCompile Include="UggComponent.cpp" />
@@ -208,9 +209,11 @@ xcopy "$(SolutionDir)Data" "$(SolutionDir)$(PlatformTarget)\Data\" /I /E /Y</Com
     <ClInclude Include="CostumCommands.h" />
     <ClInclude Include="DiskComponent.h" />
     <ClInclude Include="EnemySpawner.h" />
+    <ClInclude Include="GameIncludes.h" />
     <ClInclude Include="LevelComponent.h" />
+    <ClInclude Include="GameManager.h" />
     <ClInclude Include="MoveComponent.h" />
-    <ClInclude Include="MovePlayerComponent.h" />
+    <ClInclude Include="QbertComponent.h" />
     <ClInclude Include="CostumGameObjects.h" />
     <ClInclude Include="SlickComponent.h" />
     <ClInclude Include="UggComponent.h" />

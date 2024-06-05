@@ -4,6 +4,7 @@
 #include "TimeManager.h"
 #include "MoveComponent.h"
 #include "RenderComponent.h"
+#include "CollisionComponent.h"
 
 dae::SlickComponent::SlickComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel, const std::string& filePath)
 	:BaseComponent::BaseComponent(pParent)
@@ -20,7 +21,25 @@ dae::SlickComponent::SlickComponent(dae::GameObject* pParent, dae::LevelComponen
 	m_pMoveComponent = pParent->GetComponent<MoveComponent>();
 	if (m_pMoveComponent == nullptr)
 	{
-		m_pMoveComponent = pParent->AddComponent<MoveComponent>(pLevel);
+		m_pMoveComponent = pParent->AddComponent<MoveComponent>(pLevel,EntityType::GreenEnemy);
+	}
+
+	m_pCollision = pParent->GetComponent<CollisionComponent>();
+	if (m_pCollision == nullptr)
+	{
+		m_pCollision = pParent->AddComponent<CollisionComponent>(pLevel);
+	}
+	m_pCollision->GetSubject()->AddObserver(this);
+}
+
+void dae::SlickComponent::Notify(dae::Event e, const GameObject*)
+{
+	switch (e)
+	{
+	case dae::Event::PlayerDies:
+		break;
+	default:
+		break;
 	}
 }
 
@@ -63,6 +82,8 @@ void dae::SlickComponent::Update()
 		}
 		else
 		{
+			m_pMoveComponent->UpdateEntity(m_pMoveComponent->GetCurrentBlock()->row, m_pMoveComponent->GetCurrentBlock()->column);
+			m_pCollision->CheckCollision(m_pMoveComponent->GetEntityIdx());
 			ChangeBackBlock();
 		}
 		break;

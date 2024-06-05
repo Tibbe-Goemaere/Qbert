@@ -29,7 +29,7 @@ dae::UggComponent::UggComponent(dae::GameObject* pParent, dae::LevelComponent* p
 		{
 			col = row;
 		}
-		m_pMoveComponent = pParent->AddComponent<MoveComponent>(pLevel,row,col);
+		m_pMoveComponent = pParent->AddComponent<MoveComponent>(pLevel,EntityType::PurpleEnemy,row,col);
 	}
 }
 
@@ -67,6 +67,10 @@ void dae::UggComponent::Update()
 		if (m_pMoveComponent->CheckDeath())
 		{
 			m_pMoveComponent->StartFalling(m_lastDirection);
+		}
+		else
+		{
+			m_pMoveComponent->UpdateEntity(m_pMoveComponent->GetCurrentBlock()->row, m_pMoveComponent->GetCurrentBlock()->column);
 		}
 		break;
 	default:

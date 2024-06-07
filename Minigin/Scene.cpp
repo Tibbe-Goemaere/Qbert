@@ -52,6 +52,11 @@ void dae::Scene::SortObjectsRenderPriority()
 	});
 }
 
+std::string dae::Scene::GetSceneName() const
+{
+	return m_name;
+}
+
 void Scene::Update()
 {
 	for(auto& object : m_objects)

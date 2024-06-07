@@ -21,4 +21,5 @@
 #include "EnemySpawner.h"
 #include "UpdateManager.h"
 #include "UggComponent.h"
+#include "UIComponent.h"
 

@@ -1,0 +1,11 @@
+<level>
+    <hasThreeLayers>false</hasThreeLayers>
+    <isHardLevel>false</isHardLevel>
+    <gameMode>0</gameMode>
+    <hasCoily>true</hasCoily>
+    <hasSlick>false</hasSlick>
+    <hasUgg>false</hasUgg>
+    <texture1>../Data/Blocks/0-2.png</texture1>
+    <texture2>../Data/Blocks/0-1.png</texture2>
+    <texture3></texture3>
+<level>

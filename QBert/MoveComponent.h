@@ -35,6 +35,7 @@ namespace dae
 		void UpdateEntity(int row, int col);
 		int GetEntityIdx() const;
 		void GetNextRowColumn(int& row, int& column, const glm::vec2& dir);
+		void ResetPosition();
 
 	private:
 		MovementState m_currentState;

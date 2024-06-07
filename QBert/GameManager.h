@@ -8,6 +8,14 @@ namespace dae
 {
 	class Scene;
 	class Font;
+	class LevelComponent;
+
+	enum class GameMode
+	{
+		SinglePlayer,
+		Coop,
+		Versus
+	};
 
 	class GameManager final
 	{
@@ -22,11 +30,24 @@ namespace dae
 
 		void LoadLevel(const std::string& filename);
 	private:
-		Scene& m_scene;
 		const glm::vec2 m_windowSize;
 		std::shared_ptr<Font> m_pFont;
+		GameMode m_currentGameMode;
+		std::vector<std::string> m_singlePlayerLevelNames;
+		std::vector<std::string> m_coopLevelNames;
+		std::vector<std::string> m_versusLevelNames;
 
 		void MakeMenu();
+		void MakeSinglePlayerLevel(int idx);
+		void MakeCoopLevel(int idx);
+		void MakeVersusLevel(int idx);
+
+		//Functions for making game stuff to reuse
+		void MakeQbert(LevelComponent* pLevel, Scene& scene);
+		void AddCoilySpawn();
+		void AddSlickSpawn();
+		void AddUggSpawn();
+		void AddBaseLevel();
 	};
 }
 

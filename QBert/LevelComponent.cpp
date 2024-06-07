@@ -11,8 +11,9 @@ dae::LevelComponent::LevelComponent(dae::GameObject* pParent, const std::string&
 	,m_amountOfLayers{2}
 	,m_amountOfSteps{7}
 	,m_pDisks{}
+	,m_levelInfo{std::make_unique<XmlLevelInfo>()}
 {
-	//WriteLevel("Level1-0.xml", XmlLevelInfo{ false,false,"../Resources/Blocks/0-2.png", "../Resources/Blocks/0-1.png"});
+	//WriteLevel("../Data/Levels/Level1-1.xml", XmlLevelInfo{ false,false,0,true,false,false,"../Data/Blocks/0-2.png", "../Data/Blocks/0-1.png"});
 	LoadLevel(levelPath);
 	SetTextures();
 }
@@ -127,6 +128,17 @@ std::vector<dae::Entity*> dae::LevelComponent::LookForEntities(int entityIdx)
 	return m_pOtherEntitiesOnBlock;
 }
 
+void dae::LevelComponent::KillAllEnemies()
+{
+	for (const auto& entity : m_pEntities)
+	{
+		if (entity->entityType != EntityType::Player)
+		{
+			entity->pObject->MarkForDestroy();
+		}
+	}
+}
+
 void dae::LevelComponent::AddDisk(dae::DiskComponent* pDiskComponent)
 {
 	m_pDisks.push_back(pDiskComponent);
@@ -145,6 +157,11 @@ dae::DiskComponent* dae::LevelComponent::GetDisk(int row, int column)
 		return *it;
 	}
 	return nullptr;
+}
+
+dae::XmlLevelInfo* dae::LevelComponent::GetLevelInfo()
+{
+	return m_levelInfo.get();
 }
 
 void dae::LevelComponent::Update()
@@ -177,34 +194,50 @@ void dae::LevelComponent::LoadLevel(const std::string& filename)
 	while (std::getline(file, line)) {
 		if (line.find("<hasThreeLayers>") != std::string::npos) {
 			line = line.substr(line.find(">") + 1);
-			m_levelInfo.hasThreeLayers = (line.find("true") != std::string::npos);
+			m_levelInfo->hasThreeLayers = (line.find("true") != std::string::npos);
 		}
-		if (line.find("<isHardLevel>") != std::string::npos) {
+		else if (line.find("<isHardLevel>") != std::string::npos) {
 			line = line.substr(line.find(">") + 1);
-			m_levelInfo.isHardLevel = (line.find("true") != std::string::npos);
+			m_levelInfo->isHardLevel = (line.find("true") != std::string::npos);
 		}
-		if (line.find("<texture1>") != std::string::npos) {
+		else if (line.find("<gameMode>") != std::string::npos) {
 			line = line.substr(line.find(">") + 1);
-			m_levelInfo.startBlock = line.substr(0, line.find("<"));
+			m_levelInfo->gameMode = std::stoi(line);
 		}
-		if (line.find("<texture2>") != std::string::npos) {
+		else if (line.find("<hasCoily>") != std::string::npos) {
 			line = line.substr(line.find(">") + 1);
-			m_levelInfo.endBlock = line.substr(0, line.find("<"));
+			m_levelInfo->hasCoily = (line.find("true") != std::string::npos);
 		}
-		if (line.find("<texture3>") != std::string::npos) {
+		else if (line.find("<hasSlick>") != std::string::npos) {
 			line = line.substr(line.find(">") + 1);
-			m_levelInfo.intermediateBlock = line.substr(0, line.find("<"));
+			m_levelInfo->hasSlick = (line.find("true") != std::string::npos);
+		}
+		else if (line.find("<hasUgg>") != std::string::npos) {
+			line = line.substr(line.find(">") + 1);
+			m_levelInfo->hasUgg = (line.find("true") != std::string::npos);
+		}
+		else if (line.find("<texture1>") != std::string::npos) {
+			line = line.substr(line.find(">") + 1);
+			m_levelInfo->startBlock = line.substr(0, line.find("<"));
+		}
+		else if (line.find("<texture2>") != std::string::npos) {
+			line = line.substr(line.find(">") + 1);
+			m_levelInfo->endBlock = line.substr(0, line.find("<"));
+		}
+		else if (line.find("<texture3>") != std::string::npos) {
+			line = line.substr(line.find(">") + 1);
+			m_levelInfo->intermediateBlock = line.substr(0, line.find("<"));
 		}
 	}
 
 	file.close();
 
-	m_texturePaths.push_back(m_levelInfo.startBlock);
-	m_texturePaths.push_back(m_levelInfo.endBlock);
+	m_texturePaths.push_back(m_levelInfo->startBlock);
+	m_texturePaths.push_back(m_levelInfo->endBlock);
 
-	if (m_levelInfo.hasThreeLayers)
+	if (m_levelInfo->hasThreeLayers)
 	{
-		m_texturePaths.push_back(m_levelInfo.intermediateBlock);
+		m_texturePaths.push_back(m_levelInfo->intermediateBlock);
 		m_amountOfLayers = 3;
 	}
 
@@ -246,6 +279,10 @@ void dae::LevelComponent::WriteLevel(const std::string& filename, XmlLevelInfo i
 
 	file << "    <hasThreeLayers>" << std::boolalpha << info.hasThreeLayers << "</hasThreeLayers>\n";
 	file << "    <isHardLevel>" << std::boolalpha << info.isHardLevel << "</isHardLevel>\n";
+	file << "    <gameMode>" << std::boolalpha << info.gameMode << "</gameMode>\n";
+	file << "    <hasCoily>" << std::boolalpha << info.hasCoily << "</hasCoily>\n";
+	file << "    <hasSlick>" << std::boolalpha << info.hasSlick << "</hasSlick>\n";
+	file << "    <hasUgg>" << std::boolalpha << info.hasUgg << "</hasUgg>\n";
 	file << "    <texture1>" << info.startBlock << "</texture1>\n";
 	file << "    <texture2>" << info.endBlock << "</texture2>\n";
 	file << "    <texture3>" << info.intermediateBlock << "</texture3>\n";

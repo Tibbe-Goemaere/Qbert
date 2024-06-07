@@ -193,14 +193,16 @@ xcopy "$(SolutionDir)Data" "$(SolutionDir)$(PlatformTarget)\Data\" /I /E /Y</Com
     <ClCompile Include="CostumCommands.cpp" />
     <ClCompile Include="DiskComponent.cpp" />
     <ClCompile Include="EnemySpawner.cpp" />
+    <ClCompile Include="HealthComponent.cpp" />
+    <ClCompile Include="HealthDisplayComponent.cpp" />
     <ClCompile Include="LevelComponent.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoveComponent.cpp" />
     <ClCompile Include="QbertComponent.cpp" />
-    <ClCompile Include="CostumGameObjects.cpp" />
     <ClCompile Include="SlickComponent.cpp" />
     <ClCompile Include="UggComponent.cpp" />
+    <ClCompile Include="UIComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CoilyComponent.h" />
@@ -210,13 +212,15 @@ xcopy "$(SolutionDir)Data" "$(SolutionDir)$(PlatformTarget)\Data\" /I /E /Y</Com
     <ClInclude Include="DiskComponent.h" />
     <ClInclude Include="EnemySpawner.h" />
     <ClInclude Include="GameIncludes.h" />
+    <ClInclude Include="HealthComponent.h" />
+    <ClInclude Include="HealthDisplayComponent.h" />
     <ClInclude Include="LevelComponent.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="MoveComponent.h" />
     <ClInclude Include="QbertComponent.h" />
-    <ClInclude Include="CostumGameObjects.h" />
     <ClInclude Include="SlickComponent.h" />
     <ClInclude Include="UggComponent.h" />
+    <ClInclude Include="UIComponent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -26,6 +26,9 @@ namespace dae
 		void SetTexture(const std::string& filename, bool renderTexture = true, glm::vec2 offset = { 0,0 });
 		void SetTextTexture(std::shared_ptr<Texture2D> texture);
 		void SetRenderTexture(bool renderTexture, int textureIndex = 0);
+		void HideAllTextures();
+		void ShowAllTextures();
+		bool IsShowingTexture(int textureIndex = 0) const;
 
 		glm::vec2 GetTextureSize(const std::string& filename = "") const;
 		glm::vec2 GetTextureSizeViaIdx(int textureIdx = 0) const;

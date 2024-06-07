@@ -1,18 +1,13 @@
 #pragma once
 #include "Command.h"
+#include <string>
+#include "HealthComponent.h"
 
 namespace dae
 {
 	class GameObject;
 	class QbertComponent;
-
-	enum class Direction
-	{
-		Topleft,
-		TopRight,
-		BottomLeft,
-		BottomRight
-	};
+	class UIComponent;
 
 	class MovePlayerCommand final : public dae::Command
 	{
@@ -25,6 +20,40 @@ namespace dae
 		const glm::vec2 m_direction;
 		dae::QbertComponent* m_pPlayerMovement;
 	};
+	
+	class MoveArrows final : public dae::Command
+	{
+	public:
+		MoveArrows(bool goUp,UIComponent* pUIComponent);
+
+		void Execute() override;
+	private:
+		bool m_goUp;
+		UIComponent* m_pUIComponent;
+	};
+
+	class Scene;
+	class ChooseGameMode final : public dae::Command
+	{
+	public:
+		ChooseGameMode(const std::vector<std::string>& sceneNames, UIComponent* pUiComponen);
+
+		void Execute() override;
+	private:
+		std::vector<std::string> m_sceneNames;
+		UIComponent* m_pUIComponent;
+	};
+
+	class DieCommand final : public Command
+	{
+	public:
+		DieCommand(HealthComponent* pHealth);
+
+		void Execute() override;
+	private:
+		HealthComponent* m_pHealthComponent;
+	};
+
 }
 
 

@@ -15,16 +15,6 @@ void dae::MoveCommand::Execute()
 	m_pGameObject->SetLocalPosition(glm::vec3(newPos.x, newPos.y,newPos.z));
 }
 
-dae::DieCommand::DieCommand(HealthComponent* pHealth)
-	:m_pHealthComponent{pHealth}
-{
-}
-
-void dae::DieCommand::Execute()
-{
-	m_pHealthComponent->RemoveHealth();
-}
-
 dae::ScoreCommand::ScoreCommand(ScoreComponent* pScore, const int amount)
 	:m_pScoreComponent{ pScore }
 	,m_addedScore{amount}

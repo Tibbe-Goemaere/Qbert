@@ -14,6 +14,10 @@ namespace dae
 	{
 		bool hasThreeLayers;
 		bool isHardLevel;
+		int gameMode;
+		bool hasCoily;
+		bool hasSlick;
+		bool hasUgg;
 		std::string startBlock;
 		std::string endBlock;
 		std::string intermediateBlock = "";
@@ -75,17 +79,20 @@ namespace dae
 		Entity* GetEntityByIdx(int  entityIdx) const;
 		void UpdateEntity(int entityIdx, int row, int column);
 		std::vector<dae::Entity*> LookForEntities(int entityIdx);
+		void KillAllEnemies();
 
 		//Handling Disks
 		void AddDisk(DiskComponent* pDiskComponent);
 		void RemoveDisk(DiskComponent* pDiskComponent);
 		DiskComponent* GetDisk(int row, int column);
 
+		XmlLevelInfo* GetLevelInfo();
+
 	private:
 		std::vector<std::unique_ptr<Block>> m_pBlocks;
 		std::vector<std::string> m_texturePaths;
 		dae::RenderComponent* m_pRenderComponent;
-		XmlLevelInfo m_levelInfo;
+		std::unique_ptr<XmlLevelInfo> m_levelInfo;
 		int m_amountOfLayers;
 		int m_amountOfSteps;
 		std::vector<std::unique_ptr<Entity>> m_pEntities;

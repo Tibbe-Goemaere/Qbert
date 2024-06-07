@@ -46,6 +46,27 @@ void dae::RenderComponent::SetRenderTexture(bool renderTexture, int textureIndex
 	}
 }
 
+void dae::RenderComponent::HideAllTextures()
+{
+	for (auto& texture : m_pTextures)
+	{
+		texture.renderTexture = false;
+	}
+}
+
+void dae::RenderComponent::ShowAllTextures()
+{
+	for (auto& texture : m_pTextures)
+	{
+		texture.renderTexture = true;
+	}
+}
+
+bool dae::RenderComponent::IsShowingTexture(int textureIndex) const
+{
+	return m_pTextures[textureIndex].renderTexture;
+}
+
 glm::vec2 dae::RenderComponent::GetTextureSize(const std::string& filename) const
 {
 	if (filename.empty())

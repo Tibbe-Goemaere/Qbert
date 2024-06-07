@@ -15,6 +15,7 @@ namespace dae
 		void RemoveAll();
 		std::unique_ptr<GameObject> GetObject(GameObject* object);
 		void SortObjectsRenderPriority();
+		std::string GetSceneName() const;
 
 		void Update();
 		void LateUpdate();

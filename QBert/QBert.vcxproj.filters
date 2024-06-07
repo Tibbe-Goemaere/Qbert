@@ -36,9 +36,6 @@
     <ClCompile Include="QbertComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="CostumGameObjects.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CoilyComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
@@ -63,6 +60,15 @@
     <ClCompile Include="GameManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UIComponent.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="HealthComponent.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="HealthDisplayComponent.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CostumCommands.h">
@@ -76,9 +82,6 @@
     </ClInclude>
     <ClInclude Include="QbertComponent.h">
       <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="CostumGameObjects.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CoilyComponent.h">
       <Filter>Header Files\Components</Filter>
@@ -106,6 +109,15 @@
     </ClInclude>
     <ClInclude Include="GameIncludes.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UIComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="HealthComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="HealthDisplayComponent.h">
+      <Filter>Header Files\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

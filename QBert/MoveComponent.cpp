@@ -124,6 +124,14 @@ void dae::MoveComponent::GetNextRowColumn(int& row, int& column, const glm::vec2
 	}
 }
 
+void dae::MoveComponent::ResetPosition()
+{
+	m_pParent->SetRenderLayer(1);
+	m_pParent->SetLocalPosition(m_startPosition);
+	m_pCurrentBlock = m_pLevel->GetBlock(m_startGridPos.first, m_startGridPos.second);
+	m_currentState = MovementState::Idle;
+}
+
 void dae::MoveComponent::Fall()
 {
 	const float fallSpeed = 550.f;

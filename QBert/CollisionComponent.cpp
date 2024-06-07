@@ -54,7 +54,6 @@ void dae::CollisionComponent::HandleCollisions(dae::EntityType myType, dae::Enti
 		{
 			std::cout << "i hit purple";
 			m_pDiedEvent->NotifyObservers(Event::PlayerDies, m_pParent);
-			m_pParent->MarkForDestroy();
 		}
 		break;
 	case dae::EntityType::GreenEnemy:
@@ -70,7 +69,6 @@ void dae::CollisionComponent::HandleCollisions(dae::EntityType myType, dae::Enti
 		{
 			std::cout << "purple hit me";
 			m_pDiedEvent->NotifyObservers(Event::PlayerDies, pOtherObject);
-			pOtherObject->MarkForDestroy();
 		}
 		break;
 	default:

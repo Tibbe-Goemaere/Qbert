@@ -1,6 +1,5 @@
 #pragma once
 #include "GameObject.h"
-#include "HealthComponent.h"
 #include "ScoreComponent.h"
 namespace dae
 {
@@ -23,16 +22,7 @@ namespace dae
 		const float m_Speed;
 	};
 
-	class DieCommand final : public Command
-	{
-	public:
-		DieCommand(HealthComponent* pHealth);
-
-		void Execute() override;
-	private:
-		HealthComponent* m_pHealthComponent;
-	};
-
+	
 	class ScoreCommand final : public Command
 	{
 	public:

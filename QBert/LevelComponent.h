@@ -9,6 +9,7 @@ namespace dae
 	class GameObject;
 	class Texture2D;
 	class DiskComponent;
+	class GameManager;
 
 	struct XmlLevelInfo
 	{
@@ -18,9 +19,7 @@ namespace dae
 		bool hasCoily;
 		bool hasSlick;
 		bool hasUgg;
-		std::string startBlock;
-		std::string endBlock;
-		std::string intermediateBlock = "";
+		int blockIdx;
 	};
 
 	enum class EntityType
@@ -71,7 +70,8 @@ namespace dae
 		dae::GameObject* GetParent() const;
 		float GetBlockSize() const;
 		bool ChangeBlock(int idx, int textureIdx, bool goBack = false);
-		int GetAmountOfLayers() const;
+		int GetAmountOfSteps() const;
+	
 
 		//Handling Entities
 		int AddEntity(std::unique_ptr<Entity> pNewEntity);
@@ -102,7 +102,12 @@ namespace dae
 		void LoadLevel(const std::string& filename);
 		void WriteLevel(const std::string& filename, XmlLevelInfo info);
 
-		
+		bool CheckWin();
+		bool m_isFlickering;
+		const float m_levelFlickerTime;
+		float m_flickerTimer;
+		const float m_totalFlickerTime;
+		float m_totalFlickerTimer;
 	};
 
 	

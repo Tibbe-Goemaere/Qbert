@@ -14,7 +14,7 @@ namespace dae
 	public:
 		void Update();
 
-		SlickComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel, const std::string& filePath);
+		SlickComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel);
 		virtual ~SlickComponent() = default;
 		SlickComponent(const SlickComponent& other) = delete;
 		SlickComponent(SlickComponent&& other) = delete;

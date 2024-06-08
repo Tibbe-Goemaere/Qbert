@@ -6,24 +6,31 @@
 #include "RenderComponent.h"
 #include <random>
 
-dae::UggComponent::UggComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel, const std::string& filePath, bool isUgg)
+dae::UggComponent::UggComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel)
 	:BaseComponent::BaseComponent(pParent)
 	, m_timer{ 0.f }
 	, m_waitTime{ 1.f }
-	,m_isUgg{isUgg}
 	,m_lastDirection{0,0}
 {
+	m_isUgg = (rand() % 2) == 0;
+	std::string filepath = "Sprites/Wrongway.png";
+	if (m_isUgg)
+	{
+		filepath = "Sprites/Ugg.png";
+	}
+
+
 	auto renderComp = pParent->GetComponent<RenderComponent>();
 	if (renderComp == nullptr)
 	{
 		renderComp = pParent->AddComponent<RenderComponent>();
-		renderComp->SetTexture(filePath);
+		renderComp->SetTexture(filepath);
 	}
 
 	m_pMoveComponent = pParent->GetComponent<MoveComponent>();
 	if (m_pMoveComponent == nullptr)
 	{
-		int row = pLevel->GetAmountOfLayers() - 1;
+		int row = pLevel->GetAmountOfSteps() - 1;
 		int col = 0;
 		if (m_isUgg)
 		{

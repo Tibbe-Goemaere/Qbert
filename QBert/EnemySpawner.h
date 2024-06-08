@@ -12,10 +12,8 @@ namespace dae
 	enum class EnemyType
 	{
 		Coily,
-		Sam,
 		Slick,
 		Ugg,
-		Wrongway
 	};
 
 	struct SpawnInfo
@@ -36,14 +34,15 @@ namespace dae
 	private:
 		struct Spawn
 		{
-			std::unique_ptr<SpawnInfo> pSpawnInfo;
+			std::shared_ptr<SpawnInfo> pSpawnInfo;
 			float timeUntilNextSpawn;
 			float timeSinceLastSpawn = 0.f;
-			bool hasSpawnedOnce = true;
+			bool hasSpawnedOnce = false;
 		};
 
 	public:
 		void Update() override;
+		void Reset() override;
 
 		EnemySpawner(LevelComponent* pLevel, Scene& scene);
 		virtual ~EnemySpawner() = default;
@@ -52,7 +51,7 @@ namespace dae
 		EnemySpawner& operator=(const EnemySpawner& other) = delete;
 		EnemySpawner& operator=(EnemySpawner&& other) = delete;
 
-		void AddSpawn(std::unique_ptr<SpawnInfo> pSpawnInfo);
+		void AddSpawn(std::shared_ptr<SpawnInfo> pSpawnInfo);
 		void UpdateSpawn(Spawn* pSpawn, float deltaTime);
 
 	private:

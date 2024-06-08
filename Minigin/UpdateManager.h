@@ -21,9 +21,18 @@ namespace dae
 				pUpdater->Update();
 			}
 		}
+
 		void AddUpdater(std::unique_ptr<ObjectUpdater> pUpdater)
 		{
 			m_pUpdaters.push_back(std::move(pUpdater));
+		}
+
+		void Reset()
+		{
+			for (auto& pUpdater : m_pUpdaters)
+			{
+				pUpdater->Reset();
+			}
 		}
 	
 	};

@@ -3,7 +3,7 @@
 #include "QbertComponent.h"
 #include "UIComponent.h"
 #include "GameManager.h"
-#include "SceneManager.h"
+#include "GameManager.h"
 #include <iostream>
 
 dae::MovePlayerCommand::MovePlayerCommand(dae::GameObject* pObject, const glm::vec2& direction)
@@ -34,16 +34,15 @@ void dae::MoveArrows::Execute()
 }
 
 
-dae::ChooseGameMode::ChooseGameMode(const std::vector<std::string>& sceneNames, UIComponent* pUiComponent)
-	:m_sceneNames{ sceneNames }
-	,m_pUIComponent{pUiComponent}
+dae::ChooseGameMode::ChooseGameMode(UIComponent* pUiComponent)
+	:m_pUIComponent{pUiComponent}
 {
 }
 
 void dae::ChooseGameMode::Execute()
 {
 	std::cout << m_pUIComponent->GetCurrentSelection();
-	SceneManager::GetInstance().PickScene(m_sceneNames[m_pUIComponent->GetCurrentSelection()]);
+	GameManager::GetInstance().GoToNextLevel(m_pUIComponent->GetCurrentSelection());
 }
 
 dae::DieCommand::DieCommand(HealthComponent* pHealth)

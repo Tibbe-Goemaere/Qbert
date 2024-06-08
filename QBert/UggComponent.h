@@ -12,7 +12,7 @@ namespace dae
 	public:
 		void Update();
 
-		UggComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel, const std::string& filePath, bool isUgg);
+		UggComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel);
 		virtual ~UggComponent() = default;
 		UggComponent(const UggComponent& other) = delete;
 		UggComponent(UggComponent&& other) = delete;

@@ -38,7 +38,8 @@ void load(glm::vec2 windowSize)
 {
 	SoundLocater::RegisterSoundSystem(std::make_unique<SdlSoundSystem>());
 
-	auto gameManager = std::make_unique<GameManager>(windowSize);
+	auto& gameManager = GameManager::GetInstance();
+	gameManager.SetWindowSize(windowSize);
 	
 	/*
 	auto font = dae::ResourceManager::GetInstance().LoadFont("Fonts/Lingua.otf", 18);

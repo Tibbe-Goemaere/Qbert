@@ -5,6 +5,7 @@
 #include <random>
 #include "CoilyComponent.h"
 #include "SlickComponent.h"
+#include "UggComponent.h"
 #include "Scene.h"
 #include "SceneManager.h"
 
@@ -26,7 +27,16 @@ void dae::EnemySpawner::Update()
 	}
 }
 
-void dae::EnemySpawner::AddSpawn(std::unique_ptr<SpawnInfo> pSpawnInfo)
+void dae::EnemySpawner::Reset()
+{
+	for (auto& pSpawn : m_pSpawns)
+	{
+		pSpawn->hasSpawnedOnce = false;
+	}
+	m_totalTime = 0.f;
+}
+
+void dae::EnemySpawner::AddSpawn(std::shared_ptr<SpawnInfo> pSpawnInfo)
 {
 	auto time = GenerateRandomFloat(pSpawnInfo->timeIntervalMin,pSpawnInfo->timeIntervalMax);
 	m_pSpawns.push_back(std::make_unique<Spawn>(std::move(pSpawnInfo), time));
@@ -60,15 +70,11 @@ void dae::EnemySpawner::SpawnEnemy(EnemyType enemyType)
 	case dae::EnemyType::Coily:
 		pEnemyObject->AddComponent<CoilyComponent>(m_pLevel);
 		break;
-	case dae::EnemyType::Sam:
-		pEnemyObject->AddComponent<SlickComponent>(m_pLevel,"../Data/Sprites/Sam.png");
-		break;
 	case dae::EnemyType::Slick:
-		pEnemyObject->AddComponent<SlickComponent>(m_pLevel, "../Data/Sprites/Slick.png");
+		pEnemyObject->AddComponent<SlickComponent>(m_pLevel);
 		break;
 	case dae::EnemyType::Ugg:
-		break;
-	case dae::EnemyType::Wrongway:
+		pEnemyObject->AddComponent<UggComponent>(m_pLevel);
 		break;
 	default:
 		break;

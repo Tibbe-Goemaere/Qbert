@@ -3,14 +3,24 @@
 #include "SceneManager.h"
 #include "GameIncludes.h"
 
-dae::GameManager::GameManager(glm::vec2 windowSize)
-	:m_windowSize{windowSize}
+dae::GameManager::GameManager()
+	:m_windowSize{ glm::vec2{19020,1080} }
 	,m_pFont{ResourceManager::GetInstance().LoadFont("Fonts/q-bert-original.otf",20)}
 	,m_currentGameMode{GameMode::SinglePlayer}
+	,m_pCoilySpawnInfo{std::make_shared<SpawnInfo>(EnemyType::Coily,25.f,30.f,2.f)}
+	,m_pSlickSpawnInfo{ std::make_shared<SpawnInfo>(EnemyType::Slick,10.f,15.f,5.f) }
+	,m_pUggSpawnInfo{ std::make_shared<SpawnInfo>(EnemyType::Ugg,20.f,30.f,5.f) }
+	,m_amountOfLevels{3}
+	,m_menuName{"MainMenu"}
+	,m_currentLevelIdx{1}
 {
 	//MakeMenu();
-	MakeSinglePlayerLevel(0);
-	LoadLevel(m_singlePlayerLevelNames[0]);
+	MakeSinglePlayerLevel(m_currentLevelIdx);
+}
+
+void dae::GameManager::SetWindowSize(glm::vec2 windowSize)
+{
+	m_windowSize = windowSize;
 }
 
 void dae::GameManager::LoadLevel(const std::string& levelName)
@@ -18,9 +28,33 @@ void dae::GameManager::LoadLevel(const std::string& levelName)
 	SceneManager::GetInstance().PickScene(levelName);
 }
 
+void dae::GameManager::GoToNextLevel(const int gameMode)
+{
+	auto gameModeEnum = static_cast<GameMode>(gameMode);
+	switch (gameModeEnum)
+	{
+	case dae::GameMode::SinglePlayer:
+		MakeSinglePlayerLevel(m_currentLevelIdx + 1);
+		break;
+	case dae::GameMode::Coop:
+		MakeCoopLevel(m_currentLevelIdx + 1);
+		break;
+	case dae::GameMode::Versus:
+		MakeVersusLevel(m_currentLevelIdx + 1);
+		break;
+	default:
+		break;
+	}
+}
+
+int dae::GameManager::GetCurrentLevelIdx() const
+{
+	return m_currentLevelIdx;
+}
+
 void dae::GameManager::MakeMenu()
 {
-	auto& scene = dae::SceneManager::GetInstance().CreateScene("MainMenu");
+	auto& scene = dae::SceneManager::GetInstance().CreateScene(m_menuName);
 	//Add UI
 	const float marginBetweenText = 20.f;
 	const float distanceFromArrow = 5.f;
@@ -99,10 +133,7 @@ void dae::GameManager::MakeMenu()
 	MakeVersusLevel(0);
 
 	std::vector<std::string> m_firstLevels;
-	m_firstLevels.push_back(m_singlePlayerLevelNames[0]);
-	m_firstLevels.push_back(m_coopLevelNames[0]);
-	m_firstLevels.push_back(m_versusLevelNames[0]);
-	auto chooseCommand = std::make_unique<dae::ChooseGameMode>(m_firstLevels, uiComponent);
+	auto chooseCommand = std::make_unique<dae::ChooseGameMode>(uiComponent);
 
 
 	dae::InputManager::GetInstance().BindCommand(SDLK_SPACE, std::move(chooseCommand), true);
@@ -110,76 +141,40 @@ void dae::GameManager::MakeMenu()
 
 void dae::GameManager::MakeSinglePlayerLevel(int idx)
 {
-	std::string sceneName = "Level1-" + std::to_string(idx + 1);
-	auto& scene = dae::SceneManager::GetInstance().CreateScene(sceneName);
-	m_singlePlayerLevelNames.push_back(sceneName);
+	if (idx > m_amountOfLevels)
+	{
+		SceneManager::GetInstance().PickScene(m_menuName);
+		return;
+	}
+	const std::string currentLevelName = "Level1-" + std::to_string(idx);
+	const std::string currentLevelPath = "../Data/Levels/" + currentLevelName + ".xml";
 
-	std::string levelPath = "../Data/Levels/" + sceneName + ".xml";
+	auto& scene = dae::SceneManager::GetInstance().CreateScene(currentLevelName);
+
 	// Add level
 	auto level = std::make_unique<dae::GameObject>();
 	level->AddComponent<dae::RenderComponent>();
-	auto level1Component = level->AddComponent<dae::LevelComponent>("../Data/Levels/Level1-1.xml");
+	auto levelComponent = level->AddComponent<dae::LevelComponent>(currentLevelPath);
 	level->SetLocalPosition({ 288,70,0 });
 	scene.Add(std::move(level));
 
-	//Add disks
-	auto disk = std::make_unique<dae::GameObject>();
-	disk->AddComponent<dae::DiskComponent>(level1Component, false, 1);
-	scene.Add(std::move(disk));
+	MakeSpawns(levelComponent, scene);
+	MakeDisks(levelComponent, scene);
+	MakeQbert(levelComponent, scene);
 
-	//Coily
-	auto coily = std::make_unique<dae::GameObject>();
-
-	coily->AddComponent<dae::CoilyComponent>(level1Component);
-
-	//scene.Add(std::move(coily));
-
-	//Slick
-	auto slick = std::make_unique<dae::GameObject>();
-	slick->AddComponent<dae::SlickComponent>(level1Component, "Sprites/Slick.png");
-	scene.Add(std::move(slick));
-
-	//Add controls explanation
-	auto go = std::make_unique<dae::GameObject>();
-	go->AddComponent<dae::RenderComponent>();
-	go->AddComponent<dae::TextComponent>("Use WASD to move Qbert"
-		, m_pFont);
-	go->SetLocalPosition(glm::vec3(10, 420, 0));
-	scene.Add(std::move(go));
-
-	go = std::make_unique<dae::GameObject>();
-	go->AddComponent<dae::RenderComponent>();
-	go->AddComponent<dae::TextComponent>("Moving and falling of the level plays a sound"
-		, m_pFont);
-	go->SetLocalPosition(glm::vec3(10, 440, 0));
-	scene.Add(std::move(go));
-
-	//Update manager + enemyspawner
-	auto pEnemySpawner = std::make_unique<EnemySpawner>(level1Component, scene);
-	//auto spawnInfo = std::make_unique<SpawnInfo>(EnemyType::Coily, 10.f, 20.f, 5.f);
-	//pEnemySpawner->AddSpawn(std::move(spawnInfo));
-	UpdateManager::GetInstance().AddUpdater(std::move(pEnemySpawner));
-
-	//Ugg
-	auto ugg = std::make_unique<dae::GameObject>();
-	ugg->AddComponent<dae::UggComponent>(level1Component, "Sprites/Ugg.png", true);
-	scene.Add(std::move(ugg));
-
-	MakeQbert(level1Component, scene);
+	dae::SceneManager::GetInstance().PickScene(currentLevelName);
 }
 
 void dae::GameManager::MakeCoopLevel(int idx)
 {
 	std::string sceneName = "Level2-" + (idx + 1);
 	dae::SceneManager::GetInstance().CreateScene(sceneName);
-	m_coopLevelNames.push_back(sceneName);
 }
 
 void dae::GameManager::MakeVersusLevel(int idx)
 {
 	std::string sceneName = "Level3-" + (idx + 1);
 	dae::SceneManager::GetInstance().CreateScene(sceneName);
-	m_versusLevelNames.push_back(sceneName);
 }
 
 void dae::GameManager::MakeQbert(LevelComponent* pLevel, Scene& scene)
@@ -222,14 +217,38 @@ void dae::GameManager::MakeQbert(LevelComponent* pLevel, Scene& scene)
 	dae::InputManager::GetInstance().BindCommand(SDLK_d, std::move(downRightQbertCommand), true);
 }
 
-void dae::GameManager::AddCoilySpawn()
+void dae::GameManager::MakeSpawns(LevelComponent* pLevel, Scene& scene)
 {
+	//Update manager + enemyspawner
+	auto pEnemySpawner = std::make_unique<EnemySpawner>(pLevel, scene);
+	const auto levelInfo = pLevel->GetLevelInfo();
+	if (levelInfo->hasCoily)
+	{
+		pEnemySpawner->AddSpawn(m_pCoilySpawnInfo);
+	}
+	if (levelInfo->hasSlick)
+	{
+		pEnemySpawner->AddSpawn(m_pSlickSpawnInfo);
+	}
+	if (levelInfo->hasUgg)
+	{
+		pEnemySpawner->AddSpawn(m_pUggSpawnInfo);
+	}
+
+	UpdateManager::GetInstance().AddUpdater(std::move(pEnemySpawner));
 }
 
-void dae::GameManager::AddSlickSpawn()
+void dae::GameManager::MakeDisks(LevelComponent* pLevel, Scene& scene)
 {
-}
+	//Add disks left and right at random rows
+	int randomRow = rand() % pLevel->GetAmountOfSteps();
 
-void dae::GameManager::AddUggSpawn()
-{
+	auto disk = std::make_unique<dae::GameObject>();
+	disk->AddComponent<dae::DiskComponent>(pLevel, true, randomRow);
+	scene.Add(std::move(disk));
+
+	randomRow = rand() % pLevel->GetAmountOfSteps();
+	disk = std::make_unique<dae::GameObject>();
+	disk->AddComponent<dae::DiskComponent>(pLevel, false, randomRow);
+	scene.Add(std::move(disk));
 }

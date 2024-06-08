@@ -68,7 +68,8 @@ void dae::CollisionComponent::HandleCollisions(dae::EntityType myType, dae::Enti
 		if (otherType == EntityType::Player)
 		{
 			std::cout << "purple hit me";
-			m_pDiedEvent->NotifyObservers(Event::PlayerDies, pOtherObject);
+			auto pCollision = pOtherObject->GetComponent<CollisionComponent>();
+			pCollision->GetSubject()->NotifyObservers(Event::PlayerDies, pOtherObject);
 		}
 		break;
 	default:

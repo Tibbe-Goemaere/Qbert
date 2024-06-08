@@ -153,7 +153,7 @@ void dae::MoveComponent::Drop()
 	{
 		m_pParent->SetLocalPosition(m_startPosition);
 		m_pCurrentBlock = m_pLevel->GetBlock(m_startGridPos.first, m_startGridPos.second);
-		m_currentState = MovementState::Idle;
+		m_currentState = MovementState::Arriving;
 	}
 }
 
@@ -187,7 +187,6 @@ void dae::MoveComponent::Update()
 		Fall();
 		break;
 	case dae::MovementState::Arriving:
-		
 		m_currentState = MovementState::Idle;
 		break;
 	case dae::MovementState::Dropping:

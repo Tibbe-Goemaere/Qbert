@@ -32,7 +32,7 @@ std::unique_ptr<dae::CoilyState> dae::EggState::Update(CoilyComponent* coily)
 
 		if (pBlock != nullptr)
 		{
-			if (pBlock->row == (m_pMoveComponent->GetLevel()->GetAmountOfLayers() - 1))
+			if (pBlock->row == (m_pMoveComponent->GetLevel()->GetAmountOfSteps() - 1))
 			{
 				return std::move(std::make_unique<dae::SnakeState>());
 			}
@@ -170,7 +170,7 @@ glm::vec2 dae::SnakeState::FindNextBlock() const
 
 	bool isNotInJumpDistance = std::abs(entity->row - block->row) != 1;
 	//If at bottom always go up
-	if (block->row == (level->GetAmountOfLayers() - 1))
+	if (block->row == (level->GetAmountOfSteps() - 1))
 	{
 		direction.y = 1;
 	}

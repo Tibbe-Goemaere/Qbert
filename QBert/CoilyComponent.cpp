@@ -5,7 +5,6 @@
 #include "LevelComponent.h"
 #include "CollisionComponent.h"
 
-
 dae::CoilyComponent::CoilyComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel)
 	:BaseComponent::BaseComponent(pParent)
 	,m_pCoilyState{ std::move(std::make_unique<dae::EggState>()) }
@@ -17,10 +16,11 @@ dae::CoilyComponent::CoilyComponent(dae::GameObject* pParent, dae::LevelComponen
 		m_pRenderComponent->SetTexture("../Data/Sprites/CoilyEgg.png");
 	}
 
+	bool spawnLeft = (rand() % 2) == 0;
 	m_pMoveComponent = pParent->GetComponent<MoveComponent>();
 	if (m_pMoveComponent == nullptr)
 	{
-		m_pMoveComponent = pParent->AddComponent<MoveComponent>(pLevel,EntityType::PurpleEnemy);
+		m_pMoveComponent = pParent->AddComponent<MoveComponent>(pLevel,EntityType::PurpleEnemy,1,static_cast<int>(spawnLeft));
 	}
 
 	m_pCollision = pParent->GetComponent<CollisionComponent>();

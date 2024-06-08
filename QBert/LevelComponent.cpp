@@ -4,6 +4,10 @@
 #include <iostream>
 #include "BaseComponent.h"
 #include "DiskComponent.h"
+#include <algorithm>
+#include "TimeManager.h"
+#include "SceneManager.h"
+#include "GameManager.h"
 
 dae::LevelComponent::LevelComponent(dae::GameObject* pParent, const std::string& levelPath)
 	:BaseComponent::BaseComponent(pParent)
@@ -12,6 +16,11 @@ dae::LevelComponent::LevelComponent(dae::GameObject* pParent, const std::string&
 	,m_amountOfSteps{7}
 	,m_pDisks{}
 	,m_levelInfo{std::make_unique<XmlLevelInfo>()}
+	,m_levelFlickerTime{0.1f}
+	,m_flickerTimer{0.f}
+	,m_isFlickering{false}
+	,m_totalFlickerTime{3.f}
+	,m_totalFlickerTimer{0.f}
 {
 	//WriteLevel("../Data/Levels/Level1-1.xml", XmlLevelInfo{ false,false,0,true,false,false,"../Data/Blocks/0-2.png", "../Data/Blocks/0-1.png"});
 	LoadLevel(levelPath);
@@ -58,6 +67,7 @@ bool dae::LevelComponent::ChangeBlock(int idx, int textureIdx, bool goBack)
 		m_pBlocks[idx]->textureIndex += 1;
 		m_pRenderComponent->SetRenderTexture(false, idx + (textureIdx * amountOfBlocks));
 		m_pRenderComponent->SetRenderTexture(true, idx + ((textureIdx + 1) * amountOfBlocks));
+		CheckWin();
 		return true;
 
 	} //Check if we are not on the first layer
@@ -71,9 +81,24 @@ bool dae::LevelComponent::ChangeBlock(int idx, int textureIdx, bool goBack)
 	return false;
 }
 
-int dae::LevelComponent::GetAmountOfLayers() const
+int dae::LevelComponent::GetAmountOfSteps() const
 {
 	return m_amountOfSteps;
+}
+
+bool dae::LevelComponent::CheckWin()
+{
+	auto lastTextureIdx = m_amountOfLayers - 1;
+	bool hasWon = std::all_of(m_pBlocks.begin(), m_pBlocks.end(),
+		[lastTextureIdx](const std::unique_ptr<Block>& block) {
+			return block->textureIndex == lastTextureIdx;
+		});
+	if (hasWon)
+	{
+		m_isFlickering = true;
+		return true;
+	}
+	return false;
 }
 
 int dae::LevelComponent::AddEntity(std::unique_ptr<Entity> pNewEntity)
@@ -167,6 +192,35 @@ dae::XmlLevelInfo* dae::LevelComponent::GetLevelInfo()
 void dae::LevelComponent::Update()
 {
 	BaseComponent::Update();
+	if (m_isFlickering)
+	{
+		m_flickerTimer += TimeManager::GetInstance().GetDeltaTime();
+		m_totalFlickerTimer += m_flickerTimer;
+		if (m_flickerTimer >= m_levelFlickerTime)
+		{
+			m_flickerTimer = 0;
+			for (auto& block : m_pBlocks)
+			{
+				if (block->textureIndex >= m_amountOfLayers - 1)
+				{
+					ChangeBlock(block->idx, block->textureIndex, true);
+					
+				}
+				else
+				{
+					ChangeBlock(block->idx, block->textureIndex);
+				}
+				
+			}
+		}
+
+		if (m_totalFlickerTimer >= m_totalFlickerTime)
+		{
+			m_isFlickering = false;
+			GameManager::GetInstance().GoToNextLevel(m_levelInfo->gameMode);
+			//Go to next scene
+		}
+	}
 }
 
 void dae::LevelComponent::SetTextures()
@@ -216,28 +270,22 @@ void dae::LevelComponent::LoadLevel(const std::string& filename)
 			line = line.substr(line.find(">") + 1);
 			m_levelInfo->hasUgg = (line.find("true") != std::string::npos);
 		}
-		else if (line.find("<texture1>") != std::string::npos) {
+		else if (line.find("<blockIdx>") != std::string::npos) {
 			line = line.substr(line.find(">") + 1);
-			m_levelInfo->startBlock = line.substr(0, line.find("<"));
-		}
-		else if (line.find("<texture2>") != std::string::npos) {
-			line = line.substr(line.find(">") + 1);
-			m_levelInfo->endBlock = line.substr(0, line.find("<"));
-		}
-		else if (line.find("<texture3>") != std::string::npos) {
-			line = line.substr(line.find(">") + 1);
-			m_levelInfo->intermediateBlock = line.substr(0, line.find("<"));
+			m_levelInfo->blockIdx = std::stoi(line);
 		}
 	}
 
 	file.close();
 
-	m_texturePaths.push_back(m_levelInfo->startBlock);
-	m_texturePaths.push_back(m_levelInfo->endBlock);
+	const std::string startString = "Blocks/" + std::to_string(m_levelInfo->blockIdx) + "-";
+	const std::string endString = ".png";
+	m_texturePaths.push_back(startString + "0" + endString);
+	m_texturePaths.push_back(startString + "2" + endString);
 
 	if (m_levelInfo->hasThreeLayers)
 	{
-		m_texturePaths.push_back(m_levelInfo->intermediateBlock);
+		m_texturePaths.push_back(startString + "1" + endString);
 		m_amountOfLayers = 3;
 	}
 
@@ -283,9 +331,7 @@ void dae::LevelComponent::WriteLevel(const std::string& filename, XmlLevelInfo i
 	file << "    <hasCoily>" << std::boolalpha << info.hasCoily << "</hasCoily>\n";
 	file << "    <hasSlick>" << std::boolalpha << info.hasSlick << "</hasSlick>\n";
 	file << "    <hasUgg>" << std::boolalpha << info.hasUgg << "</hasUgg>\n";
-	file << "    <texture1>" << info.startBlock << "</texture1>\n";
-	file << "    <texture2>" << info.endBlock << "</texture2>\n";
-	file << "    <texture3>" << info.intermediateBlock << "</texture3>\n";
+	file << "    <blockIdx>" << info.blockIdx << "</blockIdx>\n";
 
 	file << "<level>\n";
 

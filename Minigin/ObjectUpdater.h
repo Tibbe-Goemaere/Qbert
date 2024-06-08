@@ -8,5 +8,6 @@ namespace dae
 		virtual ~ObjectUpdater() = default;
 
 		virtual void Update() = 0;
+		virtual void Reset() = 0;
 	};
 }

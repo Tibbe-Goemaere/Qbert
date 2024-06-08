@@ -10,6 +10,7 @@
 #include "CollisionComponent.h"
 #include "HealthDisplayComponent.h"
 #include "TimeManager.h"
+#include "UpdateManager.h"
 
 dae::QbertComponent::QbertComponent(dae::GameObject* pParent, dae::HealthComponent* pHealthComponent, LevelComponent* pLevel, float speed)
 	:BaseComponent::BaseComponent(pParent)
@@ -102,6 +103,7 @@ void dae::QbertComponent::Die()
 	m_pRenderQbert->SetRenderTexture(true, 1);
 	m_isDead = true;
 	m_pMovecomponent->GetLevel()->KillAllEnemies();
+	
 }
 
 void dae::QbertComponent::Respawn()
@@ -109,6 +111,7 @@ void dae::QbertComponent::Respawn()
 	m_isDead = false;
 	m_deadTimer = 0.f;
 	m_pRenderQbert->SetRenderTexture(true, 0);
+	UpdateManager::GetInstance().Reset();
 
 	if (m_pMovecomponent->GetCurrentState() == MovementState::Falling)
 	{

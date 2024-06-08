@@ -85,7 +85,6 @@ namespace dae
 
 			if (!(pAudioClip == nullptr))
 			{
-				//Mix_PlayChannel(-1, pAudioClip, 0);
 				m_soundsQueue.emplace(idx);
 				m_shouldProccesSoundQueue.notify_one();
 			}

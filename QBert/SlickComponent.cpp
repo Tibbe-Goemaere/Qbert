@@ -6,22 +6,28 @@
 #include "RenderComponent.h"
 #include "CollisionComponent.h"
 
-dae::SlickComponent::SlickComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel, const std::string& filePath)
+dae::SlickComponent::SlickComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel)
 	:BaseComponent::BaseComponent(pParent)
 	,m_timer{0.f}
 	,m_waitTime{1.f}
 {
+	bool isSlick = (rand() % 2) == 0;
+	std::string filepath = "Sprites/Sam.png";
+	if (isSlick)
+	{
+		filepath = "Sprites/Slick.png";
+	}
 	auto renderComp = pParent->GetComponent<RenderComponent>();
 	if (renderComp == nullptr)
 	{
 		renderComp = pParent->AddComponent<RenderComponent>();
-		renderComp->SetTexture(filePath);
+		renderComp->SetTexture(filepath);
 	}
 
 	m_pMoveComponent = pParent->GetComponent<MoveComponent>();
 	if (m_pMoveComponent == nullptr)
 	{
-		m_pMoveComponent = pParent->AddComponent<MoveComponent>(pLevel,EntityType::GreenEnemy);
+		m_pMoveComponent = pParent->AddComponent<MoveComponent>(pLevel,EntityType::GreenEnemy,1,static_cast<int>(isSlick));
 	}
 
 	m_pCollision = pParent->GetComponent<CollisionComponent>();

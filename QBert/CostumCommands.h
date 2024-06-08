@@ -36,11 +36,10 @@ namespace dae
 	class ChooseGameMode final : public dae::Command
 	{
 	public:
-		ChooseGameMode(const std::vector<std::string>& sceneNames, UIComponent* pUiComponen);
+		ChooseGameMode(UIComponent* pUiComponen);
 
 		void Execute() override;
 	private:
-		std::vector<std::string> m_sceneNames;
 		UIComponent* m_pUIComponent;
 	};
 

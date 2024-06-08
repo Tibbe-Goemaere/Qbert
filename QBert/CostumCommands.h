@@ -53,6 +53,16 @@ namespace dae
 		HealthComponent* m_pHealthComponent;
 	};
 
+	class SkipLevelCommand final : public Command
+	{
+	public:
+		SkipLevelCommand();
+
+		void Execute() override;
+	private:
+		
+	};
+
 }
 
 

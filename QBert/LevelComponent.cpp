@@ -67,11 +67,11 @@ bool dae::LevelComponent::ChangeBlock(int idx, int textureIdx, bool goBack)
 		m_pBlocks[idx]->textureIndex += 1;
 		m_pRenderComponent->SetRenderTexture(false, idx + (textureIdx * amountOfBlocks));
 		m_pRenderComponent->SetRenderTexture(true, idx + ((textureIdx + 1) * amountOfBlocks));
-		CheckWin();
 		return true;
 
-	} //Check if we are not on the first layer
-	else if (textureIdx > 0 && goBack)
+	} //Check if we are not on the first layer or if its a hard level when were on the final layer go back one
+	else if ((textureIdx > 0 && goBack) || 
+		(!goBack && m_levelInfo->isHardLevel && textureIdx == (m_amountOfLayers - 1)))
 	{
 		m_pBlocks[idx]->textureIndex -= 1;
 		m_pRenderComponent->SetRenderTexture(false, idx + (textureIdx * amountOfBlocks));
@@ -95,6 +95,7 @@ bool dae::LevelComponent::CheckWin()
 		});
 	if (hasWon)
 	{
+		KillAllEnemies();
 		m_isFlickering = true;
 		return true;
 	}
@@ -228,7 +229,7 @@ void dae::LevelComponent::Update()
 		if (m_totalFlickerTimer >= m_totalFlickerTime)
 		{
 			m_isFlickering = false;
-			GameManager::GetInstance().GoToNextLevel(m_levelInfo->gameMode);
+			GameManager::GetInstance().GoToNextLevel();
 			//Go to next scene
 		}
 	}

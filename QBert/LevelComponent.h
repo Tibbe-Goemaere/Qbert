@@ -73,7 +73,7 @@ namespace dae
 		float GetBlockSize() const;
 		bool ChangeBlock(int idx, int textureIdx, bool goBack = false);
 		int GetAmountOfSteps() const;
-	
+		bool CheckWin();
 
 		//Handling Entities
 		int AddEntity(std::unique_ptr<Entity> pNewEntity);
@@ -84,7 +84,6 @@ namespace dae
 		void KillAllEnemies();
 		void EnableEntity(int entityIdx);
 		void DisableEntity(int entityIdx);
-
 
 
 		//Handling Disks
@@ -108,7 +107,6 @@ namespace dae
 		void LoadLevel(const std::string& filename);
 		void WriteLevel(const std::string& filename, XmlLevelInfo info);
 
-		bool CheckWin();
 		bool m_isFlickering;
 		const float m_levelFlickerTime;
 		float m_flickerTimer;

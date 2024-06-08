@@ -85,29 +85,35 @@ dae::SnakeState::SnakeState()
 
 std::unique_ptr<dae::CoilyState> dae::SnakeState::Update(CoilyComponent* pCoily)
 {
-	m_timer += TimeManager::GetInstance().GetDeltaTime();
-	if (m_timer < m_waitTime)
+	switch (m_pMoveComponent->GetCurrentState())
 	{
-		return nullptr;
+	case MovementState::Idle:
+	{
+		m_timer += TimeManager::GetInstance().GetDeltaTime();
+		if (m_timer < m_waitTime)
+		{
+			return nullptr;
+		}
+		m_timer = 0;
+
+		if (m_pMoveComponent->CheckDeath())
+		{
+			return std::move(std::make_unique<dae::DyingState>());
+		}
+
+		m_pMoveComponent->Move(FindNextBlock());
+		break;
 	}
-	m_timer = 0;
-
-	if (m_pMoveComponent->CheckDeath())
-	{
-		return std::move(std::make_unique<dae::DyingState>());
-	}
-
-
-	if (m_pMoveComponent->Move(FindNextBlock()))
-	{
+	case MovementState::Arriving:
 		if (m_pMoveComponent->GetCurrentBlock())
 		{
 			m_pMoveComponent->UpdateEntity(m_pMoveComponent->GetCurrentBlock()->row, m_pMoveComponent->GetCurrentBlock()->column);
 			pCoily->CheckCollision();
 		}
+		break;
+	default:
+		break;
 	}
-
-	
 	return nullptr;
 }
 

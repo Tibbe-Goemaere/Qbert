@@ -42,7 +42,9 @@ dae::ChooseGameMode::ChooseGameMode(UIComponent* pUiComponent)
 void dae::ChooseGameMode::Execute()
 {
 	std::cout << m_pUIComponent->GetCurrentSelection();
-	GameManager::GetInstance().GoToNextLevel(m_pUIComponent->GetCurrentSelection());
+	auto& gameManager = GameManager::GetInstance();
+	gameManager.SetGameMode(static_cast<GameMode>(m_pUIComponent->GetCurrentSelection()));
+	gameManager.GoToNextLevel();
 }
 
 dae::DieCommand::DieCommand(HealthComponent* pHealth)
@@ -53,4 +55,14 @@ dae::DieCommand::DieCommand(HealthComponent* pHealth)
 void dae::DieCommand::Execute()
 {
 	m_pHealthComponent->RemoveHealth();
+}
+
+dae::SkipLevelCommand::SkipLevelCommand()
+{
+	
+}
+
+void dae::SkipLevelCommand::Execute()
+{
+	GameManager::GetInstance().GoToNextLevel();
 }

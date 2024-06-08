@@ -27,6 +27,11 @@ namespace dae
 			m_pUpdaters.push_back(std::move(pUpdater));
 		}
 
+		void RemoveAllUpdaters()
+		{
+			m_pUpdaters.clear();
+		}
+
 		void Reset()
 		{
 			for (auto& pUpdater : m_pUpdaters)

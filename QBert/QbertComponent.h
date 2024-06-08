@@ -46,5 +46,7 @@ namespace dae
 		void Respawn();
 
 		CollisionComponent* m_pCollision;
+
+		bool m_dontMove;
 	};
 }

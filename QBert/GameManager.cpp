@@ -2,18 +2,22 @@
 #include "Scene.h"
 #include "SceneManager.h"
 #include "GameIncludes.h"
+#include <iostream>
 
 dae::GameManager::GameManager()
 	:m_windowSize{ glm::vec2{19020,1080} }
 	,m_pFont{ResourceManager::GetInstance().LoadFont("Fonts/q-bert-original.otf",20)}
 	,m_currentGameMode{GameMode::SinglePlayer}
-	,m_pCoilySpawnInfo{std::make_shared<SpawnInfo>(EnemyType::Coily,25.f,30.f,2.f)}
-	,m_pSlickSpawnInfo{ std::make_shared<SpawnInfo>(EnemyType::Slick,10.f,15.f,5.f) }
-	,m_pUggSpawnInfo{ std::make_shared<SpawnInfo>(EnemyType::Ugg,20.f,30.f,5.f) }
+	,m_pCoilySpawnInfo{std::make_shared<SpawnInfo>(EnemyType::Coily,30.f,35.f,2.f)}
+	,m_pSlickSpawnInfo{ std::make_shared<SpawnInfo>(EnemyType::Slick,13.f,17.f,5.f) }
+	,m_pUggSpawnInfo{ std::make_shared<SpawnInfo>(EnemyType::Ugg,12.f,16.f,5.f) }
 	,m_amountOfLevels{3}
 	,m_menuName{"MainMenu"}
 	,m_currentLevelIdx{1}
 {
+	auto skipLevelCommand = std::make_unique<dae::SkipLevelCommand>();
+	dae::InputManager::GetInstance().BindCommand(SDLK_F1, std::move(skipLevelCommand), true);
+
 	//MakeMenu();
 	MakeSinglePlayerLevel(m_currentLevelIdx);
 }
@@ -28,19 +32,24 @@ void dae::GameManager::LoadLevel(const std::string& levelName)
 	SceneManager::GetInstance().PickScene(levelName);
 }
 
-void dae::GameManager::GoToNextLevel(const int gameMode)
+void dae::GameManager::GoToNextLevel()
 {
-	auto gameModeEnum = static_cast<GameMode>(gameMode);
-	switch (gameModeEnum)
+	InputManager::GetInstance().UnregisterCommands();
+
+	auto skipLevelCommand = std::make_unique<dae::SkipLevelCommand>();
+	dae::InputManager::GetInstance().BindCommand(SDLK_F1, std::move(skipLevelCommand), true);
+
+	++m_currentLevelIdx;
+	switch (m_currentGameMode)
 	{
 	case dae::GameMode::SinglePlayer:
-		MakeSinglePlayerLevel(m_currentLevelIdx + 1);
+		MakeSinglePlayerLevel(m_currentLevelIdx);
 		break;
 	case dae::GameMode::Coop:
-		MakeCoopLevel(m_currentLevelIdx + 1);
+		MakeCoopLevel(m_currentLevelIdx);
 		break;
 	case dae::GameMode::Versus:
-		MakeVersusLevel(m_currentLevelIdx + 1);
+		MakeVersusLevel(m_currentLevelIdx);
 		break;
 	default:
 		break;
@@ -50,6 +59,11 @@ void dae::GameManager::GoToNextLevel(const int gameMode)
 int dae::GameManager::GetCurrentLevelIdx() const
 {
 	return m_currentLevelIdx;
+}
+
+void dae::GameManager::SetGameMode(GameMode newGameMode)
+{
+	m_currentGameMode = newGameMode;
 }
 
 void dae::GameManager::MakeMenu()
@@ -128,9 +142,9 @@ void dae::GameManager::MakeMenu()
 	dae::InputManager::GetInstance().BindCommand(SDLK_s, std::move(downCommand), true);
 
 	//Choosing the gamemode command
-	MakeSinglePlayerLevel(0);
-	MakeCoopLevel(0);
-	MakeVersusLevel(0);
+	//MakeSinglePlayerLevel(0);
+	//MakeCoopLevel(0);
+	//MakeVersusLevel(0);
 
 	std::vector<std::string> m_firstLevels;
 	auto chooseCommand = std::make_unique<dae::ChooseGameMode>(uiComponent);
@@ -146,6 +160,7 @@ void dae::GameManager::MakeSinglePlayerLevel(int idx)
 		SceneManager::GetInstance().PickScene(m_menuName);
 		return;
 	}
+
 	const std::string currentLevelName = "Level1-" + std::to_string(idx);
 	const std::string currentLevelPath = "../Data/Levels/" + currentLevelName + ".xml";
 
@@ -219,6 +234,8 @@ void dae::GameManager::MakeQbert(LevelComponent* pLevel, Scene& scene)
 
 void dae::GameManager::MakeSpawns(LevelComponent* pLevel, Scene& scene)
 {
+	UpdateManager::GetInstance().RemoveAllUpdaters();
+
 	//Update manager + enemyspawner
 	auto pEnemySpawner = std::make_unique<EnemySpawner>(pLevel, scene);
 	const auto levelInfo = pLevel->GetLevelInfo();

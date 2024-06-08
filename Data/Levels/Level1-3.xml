@@ -1,9 +1,9 @@
 <level>
     <hasThreeLayers>false</hasThreeLayers>
-    <isHardLevel>false</isHardLevel>
+    <isHardLevel>true</isHardLevel>
     <gameMode>0</gameMode>
     <hasCoily>true</hasCoily>
     <hasSlick>false</hasSlick>
-    <hasUgg>false</hasUgg>
+    <hasUgg>true</hasUgg>
 	<blockIdx>2</blockIdx>
 <level>

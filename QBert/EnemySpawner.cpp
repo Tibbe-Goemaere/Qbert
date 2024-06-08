@@ -62,6 +62,11 @@ void dae::EnemySpawner::UpdateSpawn(Spawn* pSpawn, float deltaTime)
 	}
 }
 
+void dae::EnemySpawner::RemoveAllSpawns()
+{
+	m_pSpawns.clear();
+}
+
 void dae::EnemySpawner::SpawnEnemy(EnemyType enemyType)
 {
 	auto pEnemyObject = std::make_unique<dae::GameObject>();

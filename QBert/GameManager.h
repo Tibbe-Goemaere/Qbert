@@ -17,7 +17,8 @@ namespace dae
 	{
 		SinglePlayer,
 		Coop,
-		Versus
+		Versus,
+		Menu
 	};
 
 	class GameManager final : public Singleton<GameManager>
@@ -26,8 +27,9 @@ namespace dae
 		void SetWindowSize(glm::vec2 windowSize);
 
 		void LoadLevel(const std::string& filename);
-		void GoToNextLevel(const int gameMode);
+		void GoToNextLevel();
 		int GetCurrentLevelIdx() const;
+		void SetGameMode(GameMode newGameMode);
 
 	private:
 		friend class Singleton<GameManager>;
@@ -42,15 +44,15 @@ namespace dae
 		glm::vec2 m_windowSize;
 
 		std::shared_ptr<Font> m_pFont;
-		GameMode m_currentGameMode;
 		const std::string m_menuName;
-
+		
 		std::shared_ptr<SpawnInfo> m_pCoilySpawnInfo;
 		std::shared_ptr<SpawnInfo> m_pSlickSpawnInfo;
 		std::shared_ptr<SpawnInfo> m_pUggSpawnInfo;
 
 		const int m_amountOfLevels;
 		int m_currentLevelIdx;
+		GameMode m_currentGameMode;
 
 		void MakeMenu();
 		void MakeSinglePlayerLevel(int idx);
@@ -61,6 +63,7 @@ namespace dae
 		void MakeQbert(LevelComponent* pLevel, Scene& scene);
 		void MakeSpawns(LevelComponent* pLevel, Scene& scene);
 		void MakeDisks(LevelComponent* pLevel, Scene& scene);
+
 	};
 }
 

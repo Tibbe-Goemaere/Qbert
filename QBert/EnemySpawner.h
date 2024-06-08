@@ -53,7 +53,7 @@ namespace dae
 
 		void AddSpawn(std::shared_ptr<SpawnInfo> pSpawnInfo);
 		void UpdateSpawn(Spawn* pSpawn, float deltaTime);
-
+		void RemoveAllSpawns();
 	private:
 		float m_totalTime;
 		std::vector<std::unique_ptr<Spawn>> m_pSpawns;

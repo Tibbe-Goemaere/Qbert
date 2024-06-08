@@ -22,6 +22,7 @@ dae::QbertComponent::QbertComponent(dae::GameObject* pParent, dae::HealthCompone
 	,m_deadTimer{0.f}
 	,m_maxDeadTime{2.f}
 	,m_timeToRespawn{0.3f}
+	,m_dontMove{false}
 {
 	m_pCollision = pParent->GetComponent<CollisionComponent>();
 	if (m_pCollision == nullptr)
@@ -44,7 +45,7 @@ dae::QbertComponent::QbertComponent(dae::GameObject* pParent, dae::HealthCompone
 
 void dae::QbertComponent::MovePlayer(const glm::vec2& direction)
 {
-	if (m_pDisk != nullptr || m_isDead)
+	if (m_pDisk != nullptr || m_isDead || m_dontMove)
 	{
 		return;
 	}
@@ -164,6 +165,10 @@ void dae::QbertComponent::Update()
 				const int colorChangePoints = 25;
 				m_pScoreComponent->AddScore(colorChangePoints);
 				m_pCollision->CheckCollision(m_pMovecomponent->GetEntityIdx());
+				if (m_pMovecomponent->GetLevel()->CheckWin())
+				{
+
+				}
 			}
 		}
 	}

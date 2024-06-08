@@ -57,6 +57,7 @@ bool dae::MoveComponent::Move(const glm::vec2& direction, float)
 	m_pCurrentBlock = m_pLevel->GetBlock(row, column);
 
 	m_currentState = MovementState::Moving;
+	m_pLevel->DisableEntity(m_entityIdx);
 	return true;
 }
 
@@ -174,6 +175,7 @@ void dae::MoveComponent::Update()
 		{
 			m_pParent->SetLocalPosition(m_targetPosition);
 			m_currentState = MovementState::Arriving;
+			m_pLevel->EnableEntity(m_entityIdx);
 		}
 		else
 		{

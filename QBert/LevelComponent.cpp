@@ -162,6 +162,17 @@ void dae::LevelComponent::KillAllEnemies()
 			entity->pObject->MarkForDestroy();
 		}
 	}
+	m_pEntities.clear();
+}
+
+void dae::LevelComponent::EnableEntity(int entityIdx)
+{
+	m_pEntities[entityIdx]->isEnabled = true;
+}
+
+void dae::LevelComponent::DisableEntity(int entityIdx)
+{
+	m_pEntities[entityIdx]->isEnabled = false;
 }
 
 void dae::LevelComponent::AddDisk(dae::DiskComponent* pDiskComponent)

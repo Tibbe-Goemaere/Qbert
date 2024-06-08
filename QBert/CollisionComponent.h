@@ -21,6 +21,7 @@ namespace dae
 
 		void CheckCollision(int entityIdx);
 		Subject* GetSubject() const;
+
 	private:
 		LevelComponent* m_pLevel;
 		std::unique_ptr<Subject> m_pDiedEvent;

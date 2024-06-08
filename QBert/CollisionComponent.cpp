@@ -14,7 +14,12 @@ dae::CollisionComponent::CollisionComponent(GameObject* pParent, LevelComponent*
 
 void dae::CollisionComponent::CheckCollision(int entityIdx)
 {
+
 	auto pThisEntity = m_pLevel->GetEntityByIdx(entityIdx);
+	if (!pThisEntity->isEnabled)
+	{
+		return;
+	}
 	auto pEntities = m_pLevel->LookForEntities(entityIdx);
 	if (pEntities.size() == 0)
 	{
@@ -28,7 +33,10 @@ void dae::CollisionComponent::CheckCollision(int entityIdx)
 	auto myType = pThisEntity->entityType;
 	for (const auto& entity : pEntities)
 	{
-		HandleCollisions(myType,entity->entityType,entity->pObject);
+		if (entity->isEnabled)
+		{
+			HandleCollisions(myType, entity->entityType, entity->pObject);
+		}
 	}
 }
 
@@ -39,6 +47,7 @@ dae::Subject* dae::CollisionComponent::GetSubject() const
 
 void dae::CollisionComponent::HandleCollisions(dae::EntityType myType, dae::EntityType otherType, dae::GameObject* pOtherObject)
 {
+	
 	switch (myType)
 	{
 	case dae::EntityType::None:

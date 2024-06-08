@@ -45,11 +45,13 @@ namespace dae
 		int column;
 		EntityType entityType = EntityType::None;
 		GameObject* pObject;
-		Entity(int row ,int col, EntityType eType, GameObject* object)
+		bool isEnabled = true;
+		Entity(int row ,int col, EntityType eType, GameObject* object, bool isEnabled = true)
 			:row{row}
 			,column{col}
 			,entityType{eType}
 			,pObject{object}
+			,isEnabled{isEnabled}
 		{}
 	};
 
@@ -80,6 +82,10 @@ namespace dae
 		void UpdateEntity(int entityIdx, int row, int column);
 		std::vector<dae::Entity*> LookForEntities(int entityIdx);
 		void KillAllEnemies();
+		void EnableEntity(int entityIdx);
+		void DisableEntity(int entityIdx);
+
+
 
 		//Handling Disks
 		void AddDisk(DiskComponent* pDiskComponent);

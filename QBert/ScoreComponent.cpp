@@ -1,8 +1,9 @@
 #include <stdexcept>
 #include <SDL_ttf.h>
 #include "ScoreComponent.h"
+#include "GameManager.h"
 
-dae::ScoreComponent::ScoreComponent(GameObject* pParent,const int m_startScore)
+dae::ScoreComponent::ScoreComponent(GameObject* pParent, const int m_startScore)
 	:m_score{ m_startScore }
 	, BaseComponent::BaseComponent(pParent)
 {
@@ -12,6 +13,7 @@ dae::ScoreComponent::ScoreComponent(GameObject* pParent,const int m_startScore)
 void dae::ScoreComponent::AddScore(int value)
 {
 	m_score += value;
+	GameManager::GetInstance().SetAmountOfPoints(m_score, 0);
 	m_pScoreDisplayEvent->NotifyObservers(dae::Event::ScoreChanged, m_pParent);
 }
 

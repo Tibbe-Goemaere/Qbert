@@ -1,4 +1,5 @@
 #include "HealthComponent.h"
+#include "GameManager.h"
 
 
 dae::HealthComponent::HealthComponent(GameObject* pParent, const int lives)
@@ -12,7 +13,14 @@ dae::HealthComponent::HealthComponent(GameObject* pParent, const int lives)
 void dae::HealthComponent::RemoveHealth()
 {
 	--m_lives;
-	m_pLivesDisplayEvent->NotifyObservers(dae::Event::PlayerDies, m_pParent);
+	if (m_lives <= 0)
+	{
+		GameManager::GetInstance().MakeLeaderboard();
+	}
+	else
+	{
+		m_pLivesDisplayEvent->NotifyObservers(dae::Event::PlayerDies, m_pParent);
+	}
 }
 
 int dae::HealthComponent::GetLives() const

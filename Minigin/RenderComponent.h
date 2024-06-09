@@ -29,6 +29,7 @@ namespace dae
 		void HideAllTextures();
 		void ShowAllTextures();
 		bool IsShowingTexture(int textureIndex = 0) const;
+		int GetAmountOfTextures();
 
 		glm::vec2 GetTextureSize(const std::string& filename = "") const;
 		glm::vec2 GetTextureSizeViaIdx(int textureIdx = 0) const;

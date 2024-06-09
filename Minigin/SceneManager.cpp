@@ -29,6 +29,16 @@ void dae::SceneManager::Render()
 
 dae::Scene& dae::SceneManager::CreateScene(const std::string& name)
 {
+	for (auto it = m_scenes.begin(); it != m_scenes.end(); ++it)
+	{
+		if ((*it)->GetSceneName() == name)
+		{
+			// Scene with the same name already exists, remove it
+			m_scenes.erase(it);
+			break;
+		}
+	}
+
 	const auto& scene = std::shared_ptr<Scene>(new Scene(name));
 	m_scenes.push_back(scene);
 	if (m_currentScene == nullptr)

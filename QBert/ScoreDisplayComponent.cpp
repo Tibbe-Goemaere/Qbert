@@ -5,7 +5,7 @@
 
 dae::ScoreDisplayComponent::ScoreDisplayComponent(GameObject* pObject, TextComponent* pText)
 	:m_pointsText{ "Score " }
-	,BaseComponent::BaseComponent(pObject)
+	, BaseComponent::BaseComponent(pObject)
 {
 	m_pTextComponent = pText;
 	m_pScoreComponent = pObject->GetComponent<ScoreComponent>();

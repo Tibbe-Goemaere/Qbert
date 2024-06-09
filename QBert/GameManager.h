@@ -13,6 +13,7 @@ namespace dae
 	struct SpawnInfo;
 	class EnemySpawner;
 	class Command;
+	class TextComponent;
 
 	enum class GameMode
 	{
@@ -20,6 +21,12 @@ namespace dae
 		Coop,
 		Versus,
 		Menu
+	};
+
+	struct Highscore
+	{
+		std::string name;
+		int score;
 	};
 
 	class GameManager final : public Singleton<GameManager>
@@ -36,6 +43,14 @@ namespace dae
 
 		void RemoveCoilyCommands();
 		void MakeCoilyPlayer(LevelComponent* pLevel);
+
+		void MakeLeaderboard();
+		int GetCurrentLetterIdx() const;
+		void SetCurrentLetterIdx(const int idx);
+		void AddLetter();
+		void WriteToLeaderboard();
+
+		void MakeMenu();
 
 	private:
 		friend class Singleton<GameManager>;
@@ -60,7 +75,7 @@ namespace dae
 		int m_currentLevelIdx;
 		GameMode m_currentGameMode;
 
-		void MakeMenu();
+		
 		void MakeSinglePlayerLevel(int idx);
 		void MakeCoopLevel(int idx);
 		void MakeVersusLevel(int idx);
@@ -73,7 +88,17 @@ namespace dae
 
 		std::vector<Command*> m_pCoilyCommands;
 		int m_amountOfPointsPlayer1;
+		std::string m_player1Name;
 		int m_amountOfPointsPlayer2;
+
+		//Leaderboard stuff
+		std::vector<dae::Highscore> LoadLeaderboard();
+		std::vector<dae::Highscore> m_highscores;
+		const std::string m_leaderboardName;
+		const std::string m_leaderboardFilePath;
+		int m_currentLetterIdx;
+		char ConvertIntToUpperCaseLetter(int number);
+		TextComponent* m_pPlayerNameComponent;
 	};
 }
 

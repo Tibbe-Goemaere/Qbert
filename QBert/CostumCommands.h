@@ -9,6 +9,7 @@ namespace dae
 	class QbertComponent;
 	class CoilyComponent;
 	class UIComponent;
+	class RenderComponent;
 
 	class MovePlayerCommand final : public dae::Command
 	{
@@ -43,6 +44,27 @@ namespace dae
 		UIComponent* m_pUIComponent;
 	};
 
+	class MoveArrow final : public dae::Command
+	{
+	public:
+		MoveArrow(bool goRight,RenderComponent* pRenderArrows);
+
+		void Execute() override;
+	private:
+		bool m_goRight;
+		RenderComponent* m_pRenderArrows;
+	};
+
+	class ChooseLetter final : public dae::Command
+	{
+	public:
+		ChooseLetter();
+
+		void Execute() override;
+	private:
+	};
+
+
 	class Scene;
 	class ChooseGameMode final : public dae::Command
 	{
@@ -72,6 +94,16 @@ namespace dae
 		void Execute() override;
 	private:
 		
+	};
+
+	class EnterNameCommand final : public Command
+	{
+	public:
+		EnterNameCommand();
+
+		void Execute() override;
+	private:
+
 	};
 
 }

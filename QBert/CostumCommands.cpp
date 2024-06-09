@@ -6,6 +6,7 @@
 #include "GameManager.h"
 #include "GameManager.h"
 #include <iostream>
+#include "RenderComponent.h"
 
 dae::MovePlayerCommand::MovePlayerCommand(dae::GameObject* pObject, const glm::vec2& direction)
 	:m_direction{direction}
@@ -47,6 +48,53 @@ void dae::MoveArrows::Execute()
 	m_pUIComponent->ChangeSelection(m_goUp);
 }
 
+dae::MoveArrow::MoveArrow(bool goRight, RenderComponent* pRenderArrows)
+	:m_goRight{ goRight }
+	,m_pRenderArrows{ pRenderArrows }
+{
+}
+
+void dae::MoveArrow::Execute()
+{
+	auto& gameManager = GameManager::GetInstance();
+	int idx = gameManager.GetCurrentLetterIdx();
+	m_pRenderArrows->SetRenderTexture(false, idx);
+
+	if (m_goRight)
+	{
+		if (idx == m_pRenderArrows->GetAmountOfTextures() - 1)
+		{
+			idx = 0;
+		}
+		else
+		{
+			++idx;
+		}
+	}
+	else
+	{
+		if (idx == 0)
+		{
+			idx = m_pRenderArrows->GetAmountOfTextures() - 1;
+		}
+		else
+		{
+			--idx;
+		}
+
+	}
+	gameManager.SetCurrentLetterIdx(idx);
+	m_pRenderArrows->SetRenderTexture(true, idx);
+}
+
+dae::ChooseLetter::ChooseLetter()
+{
+}
+
+void dae::ChooseLetter::Execute()
+{
+	GameManager::GetInstance().AddLetter();
+}
 
 dae::ChooseGameMode::ChooseGameMode(UIComponent* pUiComponent)
 	:m_pUIComponent{pUiComponent}
@@ -81,3 +129,13 @@ void dae::SkipLevelCommand::Execute()
 	GameManager::GetInstance().GoToNextLevel();
 }
 
+dae::EnterNameCommand::EnterNameCommand()
+{
+	
+}
+
+void dae::EnterNameCommand::Execute()
+{
+	GameManager::GetInstance().WriteToLeaderboard();
+	GameManager::GetInstance().GoToNextLevel();
+}

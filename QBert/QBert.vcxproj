@@ -200,6 +200,8 @@ xcopy "$(SolutionDir)Data" "$(SolutionDir)$(PlatformTarget)\Data\" /I /E /Y</Com
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoveComponent.cpp" />
     <ClCompile Include="QbertComponent.cpp" />
+    <ClCompile Include="ScoreComponent.cpp" />
+    <ClCompile Include="ScoreDisplayComponent.cpp" />
     <ClCompile Include="SlickComponent.cpp" />
     <ClCompile Include="UggComponent.cpp" />
     <ClCompile Include="UIComponent.cpp" />
@@ -218,6 +220,8 @@ xcopy "$(SolutionDir)Data" "$(SolutionDir)$(PlatformTarget)\Data\" /I /E /Y</Com
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="MoveComponent.h" />
     <ClInclude Include="QbertComponent.h" />
+    <ClInclude Include="ScoreComponent.h" />
+    <ClInclude Include="ScoreDisplayComponent.h" />
     <ClInclude Include="SlickComponent.h" />
     <ClInclude Include="UggComponent.h" />
     <ClInclude Include="UIComponent.h" />

@@ -55,20 +55,17 @@ void dae::CollisionComponent::HandleCollisions(dae::EntityType myType, dae::Enti
 	case dae::EntityType::Player:
 		if (otherType == EntityType::GreenEnemy)
 		{
-			std::cout << "i hit green";
 			m_pCollisionEvent->NotifyObservers(Event::CaughtSlick, m_pParent);
 			pOtherObject->MarkForDestroy();
 		}
 		else if (otherType == EntityType::PurpleEnemy)
 		{
-			std::cout << "i hit purple";
 			m_pCollisionEvent->NotifyObservers(Event::PlayerDies, m_pParent);
 		}
 		break;
 	case dae::EntityType::GreenEnemy:
 		if (otherType == EntityType::Player)
 		{
-			std::cout << "green hit me";
 			m_pCollisionEvent->NotifyObservers(Event::CaughtSlick, m_pParent);
 			m_pParent->MarkForDestroy();
 		}
@@ -76,7 +73,6 @@ void dae::CollisionComponent::HandleCollisions(dae::EntityType myType, dae::Enti
 	case dae::EntityType::PurpleEnemy:
 		if (otherType == EntityType::Player)
 		{
-			std::cout << "purple hit me";
 			auto pCollision = pOtherObject->GetComponent<CollisionComponent>();
 			pCollision->GetSubject()->NotifyObservers(Event::PlayerDies, pOtherObject);
 		}

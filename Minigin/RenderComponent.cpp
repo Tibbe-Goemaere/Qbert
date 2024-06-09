@@ -67,6 +67,11 @@ bool dae::RenderComponent::IsShowingTexture(int textureIndex) const
 	return m_pTextures[textureIndex].renderTexture;
 }
 
+int dae::RenderComponent::GetAmountOfTextures()
+{
+	return static_cast<int>(m_pTextures.size());
+}
+
 glm::vec2 dae::RenderComponent::GetTextureSize(const std::string& filename) const
 {
 	if (filename.empty())

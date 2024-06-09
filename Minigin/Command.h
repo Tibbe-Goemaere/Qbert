@@ -1,6 +1,5 @@
 #pragma once
 #include "GameObject.h"
-#include "ScoreComponent.h"
 namespace dae
 {
 	class Command
@@ -20,18 +19,6 @@ namespace dae
 		GameObject* m_pGameObject;
 		const glm::vec3 m_Direction;
 		const float m_Speed;
-	};
-
-	
-	class ScoreCommand final : public Command
-	{
-	public:
-		ScoreCommand(ScoreComponent* pScore, const int amount);
-
-		void Execute() override;
-	private:
-		ScoreComponent* m_pScoreComponent;
-		const int m_addedScore;
 	};
 }
 

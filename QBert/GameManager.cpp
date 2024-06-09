@@ -3,6 +3,7 @@
 #include "SceneManager.h"
 #include "GameIncludes.h"
 #include <iostream>
+#include <fstream>
 
 dae::GameManager::GameManager()
 	:m_windowSize{ glm::vec2{19020,1080} }
@@ -13,13 +14,14 @@ dae::GameManager::GameManager()
 	,m_pUggSpawnInfo{ std::make_shared<SpawnInfo>(EnemyType::Ugg,12.f,16.f,5.f) }
 	,m_amountOfLevels{3}
 	,m_menuName{"MainMenu"}
-	,m_currentLevelIdx{1}
+	,m_currentLevelIdx{0}
+	,m_player1Name{""}
+	,m_leaderboardName{"Leaderboard"}
+	,m_pPlayerNameComponent{nullptr}
+	, m_leaderboardFilePath{"../Data/Leaderboard.xml"}
 {
 	auto skipLevelCommand = std::make_unique<dae::SkipLevelCommand>();
 	dae::InputManager::GetInstance().BindCommand(SDLK_F1, std::move(skipLevelCommand), true);
-
-	//MakeMenu();
-	MakeSinglePlayerLevel(m_currentLevelIdx);
 }
 
 void dae::GameManager::SetWindowSize(glm::vec2 windowSize)
@@ -169,23 +171,145 @@ void dae::GameManager::MakeMenu()
 	auto downCommand = std::make_unique<dae::MoveArrows>(false, uiComponent);
 	dae::InputManager::GetInstance().BindCommand(SDLK_s, std::move(downCommand), true);
 
-	//Choosing the gamemode command
-	//MakeSinglePlayerLevel(0);
-	//MakeCoopLevel(0);
-	//MakeVersusLevel(0);
-
 	std::vector<std::string> m_firstLevels;
 	auto chooseCommand = std::make_unique<dae::ChooseGameMode>(uiComponent);
 
-
 	dae::InputManager::GetInstance().BindCommand(SDLK_SPACE, std::move(chooseCommand), true);
+
+	SceneManager::GetInstance().PickScene(m_menuName);
+}
+
+void dae::GameManager::MakeLeaderboard()
+{
+	if (m_currentLevelIdx > m_amountOfLevels + 1)
+	{
+		MakeMenu();
+		m_currentLevelIdx = 0;
+		return;
+	}
+
+	auto& scene = dae::SceneManager::GetInstance().CreateScene(m_leaderboardName);
+
+	auto highScores = LoadLeaderboard();
+	
+	const float marginBetweenEntries = 20.f;
+	float yPos = 100.f; 
+
+	for (const auto& highScore : highScores) 
+	{
+		// Create a GameObject for this entry
+		auto leaderboardEntry = std::make_unique<dae::GameObject>();
+
+		// Add RenderComponent for displaying text
+		auto renderComp = leaderboardEntry->AddComponent<dae::RenderComponent>();
+		leaderboardEntry->AddComponent<dae::TextComponent>(highScore.name + "   " + std::to_string(highScore.score), m_pFont);
+
+		// Set position
+		auto textSize = renderComp->GetTextTextureSize();
+		leaderboardEntry->SetLocalPosition(glm::vec3(m_windowSize.x / 2.f - textSize.x / 2.f, yPos, 0));
+
+		// Add the GameObject to the scene
+		scene.Add(std::move(leaderboardEntry));
+
+		// Update yPos for next entry
+		yPos += textSize.y + marginBetweenEntries;
+	}
+
+	auto enterNameCommand = std::make_unique<dae::EnterNameCommand>();
+	dae::InputManager::GetInstance().BindCommand(SDLK_RETURN, std::move(enterNameCommand), true);
+
+	enterNameCommand = std::make_unique<dae::EnterNameCommand>();
+	dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::ButtonSouth, std::move(enterNameCommand), true);
+
+	dae::SceneManager::GetInstance().PickScene(m_leaderboardName);
+
+
+	auto lowestScoreIter = std::min_element(highScores.begin(), highScores.end(),
+		[](const dae::Highscore& highScore1, const dae::Highscore& highScore2) {
+			return highScore1.score < highScore2.score;
+		});
+	
+	if (lowestScoreIter != highScores.end() && m_amountOfPointsPlayer1 > lowestScoreIter->score) 
+	{
+		lowestScoreIter->score = m_amountOfPointsPlayer1;
+
+		m_highscores = highScores;
+
+		const int amountOfLetters = 26;
+		auto alfabet = std::make_unique<dae::GameObject>();
+		auto renderComp = alfabet->AddComponent<dae::RenderComponent>();
+		renderComp->SetTexture("Sprites/UI/Letters.png");
+		auto lettersSize = renderComp->GetTextureSize();
+		const float lettersHeight = 350.f;
+		alfabet->SetLocalPosition({ m_windowSize.x / 2.f - lettersSize.x / 2.f,lettersHeight,0 });
+		scene.Add(std::move(alfabet));
+
+		//Add arrows under all the letters
+		auto arrows = std::make_unique<dae::GameObject>();
+		renderComp = arrows->AddComponent<dae::RenderComponent>();
+		renderComp->SetTexture("Sprites/UI/UpArrow.png");
+		auto arrowSize = renderComp->GetTextureSize();
+		arrows->SetLocalPosition({ m_windowSize.x / 2.f - lettersSize.x / 2.f,lettersHeight + arrowSize.y,0 });
+		const float offset = lettersSize.x / static_cast<float>(amountOfLetters);
+		for (int i = 1; i < amountOfLetters; i++)
+		{
+			renderComp->SetTexture("Sprites/UI/UpArrow.png", false, { i * offset,0.f });
+		}
+		scene.Add(std::move(arrows));
+
+		//Add Name
+		auto name = std::make_unique<dae::GameObject>();
+		name->AddComponent<RenderComponent>();
+		name->SetLocalPosition({50,400,0});
+		m_pPlayerNameComponent = name->AddComponent<TextComponent>("ENTER NAME",m_pFont);
+		scene.Add(std::move(name));
+
+		//Arrow moving right/down Commands
+		auto upCommand = std::make_unique<dae::MoveArrow>(true, renderComp);
+		dae::InputManager::GetInstance().BindCommand(SDLK_d, std::move(upCommand), true);
+
+		auto downCommand = std::make_unique<dae::MoveArrow>(false, renderComp);
+		dae::InputManager::GetInstance().BindCommand(SDLK_a, std::move(downCommand), true);
+
+		auto chooseLetterCommand = std::make_unique<dae::ChooseLetter>();
+		dae::InputManager::GetInstance().BindCommand(SDLK_SPACE, std::move(chooseLetterCommand), true);
+
+		//Arrow moving right/down Commands
+		upCommand = std::make_unique<dae::MoveArrow>(true, renderComp);
+		dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::DPadRight, std::move(upCommand), true);
+
+		downCommand = std::make_unique<dae::MoveArrow>(false, renderComp);
+		dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::DPadLeft, std::move(downCommand), true);
+
+		chooseLetterCommand = std::make_unique<dae::ChooseLetter>();
+		dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::ButtonSouth, std::move(chooseLetterCommand), true);
+
+		
+	}
+}
+
+int dae::GameManager::GetCurrentLetterIdx() const
+{
+	return m_currentLetterIdx;
+}
+
+void dae::GameManager::SetCurrentLetterIdx(const int idx)
+{
+	m_currentLetterIdx = idx;
+}
+
+void dae::GameManager::AddLetter()
+{
+	auto letter = ConvertIntToUpperCaseLetter(m_currentLetterIdx);
+	m_player1Name += letter;
+	m_pPlayerNameComponent->SetText(m_player1Name);
 }
 
 void dae::GameManager::MakeSinglePlayerLevel(int idx)
 {
 	if (idx > m_amountOfLevels)
 	{
-		SceneManager::GetInstance().PickScene(m_menuName);
+		MakeLeaderboard();
 		return;
 	}
 
@@ -212,7 +336,7 @@ void dae::GameManager::MakeCoopLevel(int idx)
 {
 	if (idx > m_amountOfLevels)
 	{
-		SceneManager::GetInstance().PickScene(m_menuName);
+		MakeLeaderboard();
 		return;
 	}
 
@@ -241,7 +365,7 @@ void dae::GameManager::MakeVersusLevel(int idx)
 {
 	if (idx > m_amountOfLevels)
 	{
-		SceneManager::GetInstance().PickScene(m_menuName);
+		MakeLeaderboard();
 		return;
 	}
 
@@ -404,4 +528,78 @@ void dae::GameManager::MakeCoily(LevelComponent* pLevel, Scene& scene)
 	auto downRightCoilyCommand = std::make_unique<dae::MoveCoilyCommand>(pCoily, glm::vec2(1, -1));
 	m_pCoilyCommands.emplace_back(downRightCoilyCommand.get());
 	dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::DPadRight, std::move(downRightCoilyCommand), true);
+}
+
+std::vector<dae::Highscore> dae::GameManager::LoadLeaderboard()
+{
+	std::vector<Highscore> highscores;
+	std::ifstream file(m_leaderboardFilePath);
+	std::string line;
+	std::string playerTag = "<player>";
+	std::string endPlayerTag = "</player>";
+	std::string nameTag = "<name>";
+	std::string endNameTag = "</name>";
+	std::string scoreTag = "<score>";
+	std::string endScoreTag = "</score>";
+
+	while (std::getline(file, line)) {
+		if (line.find(playerTag) != std::string::npos) {
+			Highscore player;
+
+			// Read the next line, which contains both <name> and <score>
+			std::getline(file, line);
+
+			// Extract the name
+			size_t start = line.find(nameTag) + nameTag.size();
+			size_t end = line.find(endNameTag);
+			player.name = line.substr(start, end - start);
+
+			// Extract the score
+			start = line.find(scoreTag) + scoreTag.size();
+			end = line.find(endScoreTag);
+			player.score = std::stoi(line.substr(start, end - start));
+
+			highscores.push_back(player);
+
+			// Read until the end of the player tag
+			std::getline(file, line); // Read </player> line
+		}
+	}
+	m_highscores = highscores;
+	return highscores;
+}
+
+void dae::GameManager::WriteToLeaderboard()
+{
+	int score = m_amountOfPointsPlayer1;
+	// Find the Highscore with the same score and update its name
+	auto it = std::find_if(m_highscores.begin(), m_highscores.end(), [score](const Highscore& hs) {
+		return hs.score == score;
+		});
+
+	if (it != m_highscores.end()) {
+		it->name = m_player1Name;
+	}
+
+	// Overwrite the XML file with the updated highscores
+	std::ofstream file(m_leaderboardFilePath);
+
+	file << "<leaderboard>\n";
+	for (const auto& hs : m_highscores) {
+		file << "    <player>\n";
+		file << "        <name>" << hs.name << "</name><score>" << hs.score << "</score>\n";
+		file << "    </player>\n";
+	}
+	file << "</leaderboard>\n";
+
+	file.close();
+	m_player1Name = "";
+}
+
+char dae::GameManager::ConvertIntToUpperCaseLetter(int number)
+{
+	if (number < 0 || number > 25) {
+		throw std::out_of_range("Number must be between 0 and 25");
+	}
+	return static_cast<char>('A' + number);
 }

@@ -7,7 +7,7 @@ dae::UIComponent::UIComponent(GameObject* pParent, std::vector<RenderComponent*>
 	,m_currentSelection{0}
 	,m_pArrows{pArrows}
 {
-	for (int i = 1; i < m_pArrows.size(); i++)
+	for (int i = 1; i < static_cast<int>(m_pArrows.size()); i++)
 	{
 		m_pArrows[i]->HideAllTextures();
 	}

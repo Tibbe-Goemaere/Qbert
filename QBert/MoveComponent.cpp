@@ -27,6 +27,14 @@ dae::MoveComponent::MoveComponent(dae::GameObject* pParent, LevelComponent* pLev
 	m_startPosition = glm::vec3(pos.x + m_blockSize / 2.f - textureSize.x / 2.f, pos.y - textureSize.y / 2.f, 0);
 	pParent->SetLocalPosition(m_startPosition);
 
+	if (m_pLevel->GetLevelInfo()->gameMode == 1)
+	{
+		auto startBlock = pLevel->GetBlock(0, 0);
+		pos = glm::vec2(levelPos.x, levelPos.y) + startBlock->pos;
+		m_startGridPos = { 0,0 };
+	}
+	m_startPosition = glm::vec3(pos.x + m_blockSize / 2.f - textureSize.x / 2.f, pos.y - textureSize.y / 2.f, 0);
+
 	auto newEntity = std::make_unique<dae::Entity>(row, column, eType,pParent);
 	m_entityIdx = pLevel->AddEntity(std::move(newEntity));
 }

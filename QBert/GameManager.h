@@ -86,6 +86,8 @@ namespace dae
 		void MakeDisks(LevelComponent* pLevel, Scene& scene);
 		void MakeCoily(LevelComponent* pLevel, Scene& scene);
 
+		void MakeInstructionPage(GameMode gameMode);
+
 		std::vector<Command*> m_pCoilyCommands;
 		int m_amountOfPointsPlayer1;
 		std::string m_player1Name;
@@ -99,6 +101,8 @@ namespace dae
 		int m_currentLetterIdx;
 		char ConvertIntToUpperCaseLetter(int number);
 		TextComponent* m_pPlayerNameComponent;
+
+		const std::string m_instructionName;
 	};
 }
 

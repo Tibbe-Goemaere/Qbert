@@ -14,11 +14,12 @@ dae::GameManager::GameManager()
 	,m_pUggSpawnInfo{ std::make_shared<SpawnInfo>(EnemyType::Ugg,12.f,16.f,5.f) }
 	,m_amountOfLevels{3}
 	,m_menuName{"MainMenu"}
-	,m_currentLevelIdx{0}
+	,m_currentLevelIdx{-1}
 	,m_player1Name{""}
 	,m_leaderboardName{"Leaderboard"}
 	,m_pPlayerNameComponent{nullptr}
 	, m_leaderboardFilePath{"../Data/Leaderboard.xml"}
+	,m_instructionName{"Instruction"}
 {
 	auto skipLevelCommand = std::make_unique<dae::SkipLevelCommand>();
 	dae::InputManager::GetInstance().BindCommand(SDLK_F1, std::move(skipLevelCommand), true);
@@ -42,6 +43,12 @@ void dae::GameManager::GoToNextLevel()
 	dae::InputManager::GetInstance().BindCommand(SDLK_F1, std::move(skipLevelCommand), true);
 
 	++m_currentLevelIdx;
+	if (m_currentLevelIdx == 0)
+	{
+		MakeInstructionPage(m_currentGameMode);
+		return;
+	}
+
 	switch (m_currentGameMode)
 	{
 	case dae::GameMode::SinglePlayer:
@@ -174,7 +181,7 @@ void dae::GameManager::MakeMenu()
 	std::vector<std::string> m_firstLevels;
 	auto chooseCommand = std::make_unique<dae::ChooseGameMode>(uiComponent);
 
-	dae::InputManager::GetInstance().BindCommand(SDLK_SPACE, std::move(chooseCommand), true);
+	dae::InputManager::GetInstance().BindCommand(SDLK_RETURN, std::move(chooseCommand), true);
 
 	SceneManager::GetInstance().PickScene(m_menuName);
 }
@@ -184,7 +191,7 @@ void dae::GameManager::MakeLeaderboard()
 	if (m_currentLevelIdx > m_amountOfLevels + 1)
 	{
 		MakeMenu();
-		m_currentLevelIdx = 0;
+		m_currentLevelIdx = -1;
 		return;
 	}
 
@@ -219,7 +226,7 @@ void dae::GameManager::MakeLeaderboard()
 	dae::InputManager::GetInstance().BindCommand(SDLK_RETURN, std::move(enterNameCommand), true);
 
 	enterNameCommand = std::make_unique<dae::EnterNameCommand>();
-	dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::ButtonSouth, std::move(enterNameCommand), true);
+	dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::Options, std::move(enterNameCommand), true);
 
 	dae::SceneManager::GetInstance().PickScene(m_leaderboardName);
 
@@ -462,7 +469,7 @@ void dae::GameManager::MakeQbert(LevelComponent* pLevel, Scene& scene, const std
 		dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::DPadDown, std::move(downLeftQbertCommand), true);
 
 		auto downRightQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(1, -1));
-		dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::DPadLeft, std::move(downRightQbertCommand), true);
+		dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::DPadRight, std::move(downRightQbertCommand), true);
 	}
 	
 }
@@ -528,6 +535,43 @@ void dae::GameManager::MakeCoily(LevelComponent* pLevel, Scene& scene)
 	auto downRightCoilyCommand = std::make_unique<dae::MoveCoilyCommand>(pCoily, glm::vec2(1, -1));
 	m_pCoilyCommands.emplace_back(downRightCoilyCommand.get());
 	dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::DPadRight, std::move(downRightCoilyCommand), true);
+}
+
+void dae::GameManager::MakeInstructionPage(GameMode gameMode)
+{
+	auto& scene = dae::SceneManager::GetInstance().CreateScene(m_instructionName);
+
+	std::string instructionFilePath = "";
+	switch (gameMode)
+	{
+	case dae::GameMode::SinglePlayer:
+		instructionFilePath = "Instructions/SinglePlayer.png";
+		break;
+	case dae::GameMode::Coop:
+		instructionFilePath = "Instructions/Coop.png";
+		break;
+	case dae::GameMode::Versus:
+		instructionFilePath = "Instructions/Versus.png";
+		break;
+	case dae::GameMode::Menu:
+		break;
+	default:
+		break;
+	}
+
+	auto instuctionPage = std::make_unique<dae::GameObject>();
+	auto pRenderComp = instuctionPage->AddComponent<RenderComponent>();
+	pRenderComp->SetTexture(instructionFilePath);
+	scene.Add(std::move(instuctionPage));
+
+
+	auto skipLevelCommand = std::make_unique<dae::SkipLevelCommand>();
+	dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::Options, std::move(skipLevelCommand), true);
+
+	skipLevelCommand = std::make_unique<dae::SkipLevelCommand>();
+	dae::InputManager::GetInstance().BindCommand(SDLK_RETURN, std::move(skipLevelCommand), true);
+
+	dae::SceneManager::GetInstance().PickScene(m_instructionName);
 }
 
 std::vector<dae::Highscore> dae::GameManager::LoadLeaderboard()

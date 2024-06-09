@@ -2,6 +2,7 @@
 #include "CoilyComponent.h"
 #include "MoveComponent.h"
 #include "TimeManager.h"
+#include "CollisionComponent.h"
 
 dae::EggState::EggState()
 	:m_timer{ 0 }
@@ -85,23 +86,29 @@ dae::SnakeState::SnakeState()
 
 std::unique_ptr<dae::CoilyState> dae::SnakeState::Update(CoilyComponent* pCoily)
 {
+	bool isPlayable = m_pMoveComponent->GetLevel()->GetLevelInfo()->gameMode == 2;
+
 	switch (m_pMoveComponent->GetCurrentState())
 	{
 	case MovementState::Idle:
 	{
-		m_timer += TimeManager::GetInstance().GetDeltaTime();
-		if (m_timer < m_waitTime)
+		if (!isPlayable)
 		{
-			return nullptr;
-		}
-		m_timer = 0;
+			m_timer += TimeManager::GetInstance().GetDeltaTime();
+			if (m_timer < m_waitTime)
+			{
+				return nullptr;
+			}
+			m_timer = 0;
 
-		if (m_pMoveComponent->CheckDeath())
-		{
-			return std::move(std::make_unique<dae::DyingState>());
-		}
+			if (m_pMoveComponent->CheckDeath())
+			{
+				Die();
+				return nullptr;
+			}
 
-		m_pMoveComponent->Move(FindNextBlock());
+			m_pMoveComponent->Move(FindNextBlock());
+		}
 		break;
 	}
 	case MovementState::Arriving:
@@ -109,6 +116,14 @@ std::unique_ptr<dae::CoilyState> dae::SnakeState::Update(CoilyComponent* pCoily)
 		{
 			m_pMoveComponent->UpdateEntity(m_pMoveComponent->GetCurrentBlock()->row, m_pMoveComponent->GetCurrentBlock()->column);
 			pCoily->CheckCollision();
+		}
+		if (isPlayable)
+		{
+			if (m_pMoveComponent->CheckDeath())
+			{
+				Die();
+				return nullptr;
+			}
 		}
 		break;
 	default:
@@ -129,7 +144,7 @@ void dae::SnakeState::OnEnter(CoilyComponent* pCoilyComponent)
 
 void dae::SnakeState::OnExit(CoilyComponent*)
 {
-	m_pMoveComponent->StartFalling();
+	
 }
 
 glm::vec2 dae::SnakeState::FindNextBlock() const
@@ -141,7 +156,7 @@ glm::vec2 dae::SnakeState::FindNextBlock() const
 	float rowDifference = static_cast<float>(std::abs(block->row - entity->row)) - 0.5f;
 	float myCol = static_cast<float>(block->column);
 	float entityCol = static_cast<float>(entity->column);
-	glm::vec2 direction(0, 1);
+	glm::vec2 direction(0, -1);
 
 	if (block->row < entity->row)
 	{
@@ -210,20 +225,10 @@ glm::vec2 dae::SnakeState::FindNextBlock() const
 	return direction;
 }
 
-dae::DyingState::DyingState()
+void dae::SnakeState::Die()
 {
-}
-
-std::unique_ptr<dae::CoilyState> dae::DyingState::Update(CoilyComponent*)
-{
-	return nullptr;
-}
-
-void dae::DyingState::OnEnter(CoilyComponent*)
-{
-
-}
-
-void dae::DyingState::OnExit(CoilyComponent*)
-{
+	auto entity = m_pMoveComponent->GetLevel()->GetEntity(EntityType::Player);
+	auto qbert = entity->pObject->GetComponent<CollisionComponent>();
+	qbert->GetSubject()->NotifyObservers(Event::CoilyDied, entity->pObject);
+	m_pMoveComponent->StartFalling();
 }

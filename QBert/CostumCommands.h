@@ -7,6 +7,7 @@ namespace dae
 {
 	class GameObject;
 	class QbertComponent;
+	class CoilyComponent;
 	class UIComponent;
 
 	class MovePlayerCommand final : public dae::Command
@@ -16,9 +17,19 @@ namespace dae
 
 		void Execute() override;
 	private:
-		dae::GameObject* m_pGameObject;
 		const glm::vec2 m_direction;
 		dae::QbertComponent* m_pPlayerMovement;
+	};
+
+	class MoveCoilyCommand final : public dae::Command
+	{
+	public:
+		MoveCoilyCommand(dae::GameObject* pObject, const glm::vec2& direction);
+
+		void Execute() override;
+	private:
+		const glm::vec2 m_direction;
+		dae::CoilyComponent* m_pCoilyMovement;
 	};
 	
 	class MoveArrows final : public dae::Command

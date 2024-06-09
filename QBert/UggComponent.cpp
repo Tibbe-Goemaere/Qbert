@@ -5,6 +5,8 @@
 #include "MoveComponent.h"
 #include "RenderComponent.h"
 #include <random>
+#include "CollisionComponent.h"
+#include "Observer.h"
 
 dae::UggComponent::UggComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel)
 	:BaseComponent::BaseComponent(pParent)
@@ -12,6 +14,13 @@ dae::UggComponent::UggComponent(dae::GameObject* pParent, dae::LevelComponent* p
 	, m_waitTime{ 1.f }
 	,m_lastDirection{0,0}
 {
+	m_pCollision = pParent->GetComponent<CollisionComponent>();
+	if (m_pCollision == nullptr)
+	{
+		m_pCollision = pParent->AddComponent<CollisionComponent>(pLevel);
+	}
+
+
 	m_isUgg = (rand() % 2) == 0;
 	std::string filepath = "Sprites/Wrongway.png";
 	if (m_isUgg)
@@ -39,6 +48,7 @@ dae::UggComponent::UggComponent(dae::GameObject* pParent, dae::LevelComponent* p
 		m_pMoveComponent = pParent->AddComponent<MoveComponent>(pLevel,EntityType::PurpleEnemy,row,col);
 	}
 }
+
 
 void dae::UggComponent::Update()
 {
@@ -78,6 +88,7 @@ void dae::UggComponent::Update()
 		else
 		{
 			m_pMoveComponent->UpdateEntity(m_pMoveComponent->GetCurrentBlock()->row, m_pMoveComponent->GetCurrentBlock()->column);
+			m_pCollision->CheckCollision(m_pMoveComponent->GetEntityIdx());
 		}
 		break;
 	default:

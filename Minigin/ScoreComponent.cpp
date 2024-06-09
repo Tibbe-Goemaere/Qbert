@@ -2,8 +2,8 @@
 #include <SDL_ttf.h>
 #include "ScoreComponent.h"
 
-dae::ScoreComponent::ScoreComponent(GameObject* pParent)
-	:m_score{ 0 }
+dae::ScoreComponent::ScoreComponent(GameObject* pParent,const int m_startScore)
+	:m_score{ m_startScore }
 	, BaseComponent::BaseComponent(pParent)
 {
 	m_pScoreDisplayEvent = std::make_unique<Subject>();

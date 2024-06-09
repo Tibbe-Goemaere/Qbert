@@ -156,3 +156,24 @@ void dae::InputManager::UnregisterCommands()
 	m_ControllerCommands.clear();
 	m_KeyboardCommands.clear();
 }
+
+void dae::InputManager::UnregisterCommand(Command* pCommand)
+{
+	// Remove from keyboard commands
+	m_KeyboardCommands.erase(
+		std::remove_if(m_KeyboardCommands.begin(), m_KeyboardCommands.end(),
+			[pCommand](const KeyboardCommandPair& pair) {
+				return pair.pCommand.get() == pCommand;
+			}),
+		m_KeyboardCommands.end()
+	);
+
+	// Remove from controller commands
+	m_ControllerCommands.erase(
+		std::remove_if(m_ControllerCommands.begin(), m_ControllerCommands.end(),
+			[pCommand](const ControllerCommandPair& pair) {
+				return pair.pCommand.get() == pCommand;
+			}),
+		m_ControllerCommands.end()
+	);
+}

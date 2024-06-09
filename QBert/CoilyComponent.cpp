@@ -64,3 +64,12 @@ void dae::CoilyComponent::CheckCollision()
 {
 	m_pCollision->CheckCollision(m_pMoveComponent->GetEntityIdx());
 }
+
+void dae::CoilyComponent::MoveCoily(const glm::vec2 direction)
+{
+	if (dynamic_cast<dae::SnakeState*>(m_pCoilyState.get())) 
+	{
+		m_pMoveComponent->Move(direction);
+	}
+	
+}

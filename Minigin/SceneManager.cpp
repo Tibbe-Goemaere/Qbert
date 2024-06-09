@@ -51,3 +51,8 @@ void dae::SceneManager::PickScene(const std::string& name)
 		m_currentScene = *it;
 	}
 }
+
+dae::Scene& dae::SceneManager::GetCurrentScene() const
+{
+	return *m_currentScene;
+}

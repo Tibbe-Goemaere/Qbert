@@ -22,4 +22,5 @@
 #include "UpdateManager.h"
 #include "UggComponent.h"
 #include "UIComponent.h"
+#include "Command.h"
 

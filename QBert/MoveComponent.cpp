@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "TimeManager.h"
 #include "CostumCommands.h"
+#include "QbertComponent.h"
 
 dae::MoveComponent::MoveComponent(dae::GameObject* pParent, LevelComponent* pLevel, EntityType eType, int row, int column, float speed)
 	:BaseComponent::BaseComponent(pParent)
@@ -12,6 +13,8 @@ dae::MoveComponent::MoveComponent(dae::GameObject* pParent, LevelComponent* pLev
 	,m_dropDirection{}
 	,m_startGridPos{std::make_pair(row,column)}
 	,m_fallDirection{0,1}
+	,m_dropTime{1.f}
+	,m_dropTimer{0.f}
 {
 	m_pCurrentBlock = pLevel->GetBlock(row, column);
 
@@ -186,6 +189,15 @@ void dae::MoveComponent::Update()
 		}
 		break;
 	case dae::MovementState::Falling:
+		m_dropTimer += TimeManager::GetInstance().GetDeltaTime();
+		if (m_dropTimer >= m_dropTime)
+		{
+			auto qbert = m_pParent->GetComponent<dae::QbertComponent>();
+			if (qbert == nullptr)
+			{
+				m_pParent->MarkForDestroy();
+			}
+		}
 		Fall();
 		break;
 	case dae::MovementState::Arriving:

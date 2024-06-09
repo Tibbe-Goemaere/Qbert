@@ -1,11 +1,11 @@
 #pragma once
 #include "BaseComponent.h"
-#include <string>
 
 namespace dae
 {
 	class LevelComponent;
 	class MoveComponent;
+	class CollisionComponent;
 
 	class UggComponent final : public BaseComponent
 	{
@@ -18,11 +18,13 @@ namespace dae
 		UggComponent(UggComponent&& other) = delete;
 		UggComponent& operator=(const UggComponent& other) = delete;
 		UggComponent& operator=(UggComponent&& other) = delete;
+
 	private:
 		float m_timer;
 		const float m_waitTime;
 		MoveComponent* m_pMoveComponent;
 		bool m_isUgg;
 		glm::vec2 m_lastDirection;
+		CollisionComponent* m_pCollision;
 	};
 }

@@ -50,22 +50,14 @@ namespace dae
 		virtual std::unique_ptr<CoilyState> Update(CoilyComponent* pComponent) override;
 		virtual void OnEnter(CoilyComponent* pCoilyComponent) override;
 		virtual void OnExit(CoilyComponent* pCoilyComponent) override;
+
 	private:
 		float m_timer;
 		const float m_waitTime;
 		MoveComponent* m_pMoveComponent;
 
 		glm::vec2 FindNextBlock() const;
-	};
-
-	class DyingState final : public CoilyState
-	{
-	public:
-		DyingState();
-		virtual ~DyingState() {}
-		virtual std::unique_ptr<CoilyState> Update(CoilyComponent* pComponent) override;
-		virtual void OnEnter(CoilyComponent* pCoilyComponent) override;
-		virtual void OnExit(CoilyComponent* pCoilyComponent) override;
+		void Die();
 	};
 
 }

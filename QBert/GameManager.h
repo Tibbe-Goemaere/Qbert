@@ -12,6 +12,7 @@ namespace dae
 	class LevelComponent;
 	struct SpawnInfo;
 	class EnemySpawner;
+	class Command;
 
 	enum class GameMode
 	{
@@ -29,7 +30,12 @@ namespace dae
 		void LoadLevel(const std::string& filename);
 		void GoToNextLevel();
 		int GetCurrentLevelIdx() const;
+		void SetAmountOfPoints(int amountOfPoints, int playerIdx = 0);
+
 		void SetGameMode(GameMode newGameMode);
+
+		void RemoveCoilyCommands();
+		void MakeCoilyPlayer(LevelComponent* pLevel);
 
 	private:
 		friend class Singleton<GameManager>;
@@ -60,10 +66,14 @@ namespace dae
 		void MakeVersusLevel(int idx);
 
 		//Functions for making game stuff to reuse
-		void MakeQbert(LevelComponent* pLevel, Scene& scene);
+		void MakeQbert(LevelComponent* pLevel, Scene& scene, const std::pair<int,int> gridPos = {0,0}, bool isSecondPlayer = false);
 		void MakeSpawns(LevelComponent* pLevel, Scene& scene);
 		void MakeDisks(LevelComponent* pLevel, Scene& scene);
+		void MakeCoily(LevelComponent* pLevel, Scene& scene);
 
+		std::vector<Command*> m_pCoilyCommands;
+		int m_amountOfPointsPlayer1;
+		int m_amountOfPointsPlayer2;
 	};
 }
 

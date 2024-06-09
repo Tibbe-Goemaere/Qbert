@@ -81,7 +81,8 @@ namespace dae
 		Entity* GetEntityByIdx(int  entityIdx) const;
 		void UpdateEntity(int entityIdx, int row, int column);
 		std::vector<dae::Entity*> LookForEntities(int entityIdx);
-		void KillAllEnemies();
+		void KillAllEnemies(bool saveCoily = false);
+		
 		void EnableEntity(int entityIdx);
 		void DisableEntity(int entityIdx);
 
@@ -90,6 +91,7 @@ namespace dae
 		void AddDisk(DiskComponent* pDiskComponent);
 		void RemoveDisk(DiskComponent* pDiskComponent);
 		DiskComponent* GetDisk(int row, int column);
+		int GetAmountOfDisks() const;
 
 		XmlLevelInfo* GetLevelInfo();
 
@@ -101,6 +103,7 @@ namespace dae
 		int m_amountOfLayers;
 		int m_amountOfSteps;
 		std::vector<std::unique_ptr<Entity>> m_pEntities;
+		void KillEntities(EntityType eType, bool saveCoily);
 		std::vector<DiskComponent*> m_pDisks;
 
 		void SetTextures();

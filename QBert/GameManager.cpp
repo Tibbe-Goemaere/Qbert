@@ -61,9 +61,37 @@ int dae::GameManager::GetCurrentLevelIdx() const
 	return m_currentLevelIdx;
 }
 
+void dae::GameManager::SetAmountOfPoints(int amountOfPoints, int playerIdx)
+{
+	if (playerIdx == 0)
+	{
+		m_amountOfPointsPlayer1 = amountOfPoints;
+	}
+	else
+	{
+		m_amountOfPointsPlayer2 = amountOfPoints;
+	}
+}
+
 void dae::GameManager::SetGameMode(GameMode newGameMode)
 {
 	m_currentGameMode = newGameMode;
+}
+
+void dae::GameManager::RemoveCoilyCommands()
+{
+	auto& inputManager = InputManager::GetInstance();
+	for (const auto& pCommand : m_pCoilyCommands)
+	{
+		inputManager.UnregisterCommand(pCommand);
+	}
+	m_pCoilyCommands.clear();
+}
+
+void dae::GameManager::MakeCoilyPlayer(LevelComponent* pLevel)
+{
+	auto& scene = SceneManager::GetInstance().GetCurrentScene();
+	MakeCoily(pLevel, scene);
 }
 
 void dae::GameManager::MakeMenu()
@@ -182,29 +210,89 @@ void dae::GameManager::MakeSinglePlayerLevel(int idx)
 
 void dae::GameManager::MakeCoopLevel(int idx)
 {
-	std::string sceneName = "Level2-" + (idx + 1);
-	dae::SceneManager::GetInstance().CreateScene(sceneName);
+	if (idx > m_amountOfLevels)
+	{
+		SceneManager::GetInstance().PickScene(m_menuName);
+		return;
+	}
+
+	const std::string currentLevelName = "Level2-" + std::to_string(idx);
+	const std::string currentLevelPath = "../Data/Levels/" + currentLevelName + ".xml";
+
+	auto& scene = dae::SceneManager::GetInstance().CreateScene(currentLevelName);
+
+	// Add level
+	auto level = std::make_unique<dae::GameObject>();
+	level->AddComponent<dae::RenderComponent>();
+	auto levelComponent = level->AddComponent<dae::LevelComponent>(currentLevelPath);
+	level->SetLocalPosition({ 288,70,0 });
+	scene.Add(std::move(level));
+
+	MakeSpawns(levelComponent, scene);
+	MakeDisks(levelComponent, scene);
+	const int lowestRow = levelComponent->GetAmountOfSteps() - 1;
+	MakeQbert(levelComponent, scene,{ lowestRow,0});
+	MakeQbert(levelComponent, scene, { lowestRow,lowestRow },true);
+
+	dae::SceneManager::GetInstance().PickScene(currentLevelName);
 }
 
 void dae::GameManager::MakeVersusLevel(int idx)
 {
-	std::string sceneName = "Level3-" + (idx + 1);
-	dae::SceneManager::GetInstance().CreateScene(sceneName);
+	if (idx > m_amountOfLevels)
+	{
+		SceneManager::GetInstance().PickScene(m_menuName);
+		return;
+	}
+
+	const std::string currentLevelName = "Level3-" + std::to_string(idx);
+	const std::string currentLevelPath = "../Data/Levels/" + currentLevelName + ".xml";
+
+	auto& scene = dae::SceneManager::GetInstance().CreateScene(currentLevelName);
+
+	// Add level
+	auto level = std::make_unique<dae::GameObject>();
+	level->AddComponent<dae::RenderComponent>();
+	auto levelComponent = level->AddComponent<dae::LevelComponent>(currentLevelPath);
+	level->SetLocalPosition({ 288,70,0 });
+	scene.Add(std::move(level));
+
+	MakeSpawns(levelComponent, scene);
+	MakeDisks(levelComponent, scene);
+	MakeQbert(levelComponent, scene);
+
+	MakeCoily(levelComponent, scene);
+
+	dae::SceneManager::GetInstance().PickScene(currentLevelName);
 }
 
-void dae::GameManager::MakeQbert(LevelComponent* pLevel, Scene& scene)
+void dae::GameManager::MakeQbert(LevelComponent* pLevel, Scene& scene, const std::pair<int, int> gridPos, bool isSecondPlayer)
 {
 	//Add Qbert UI
 	auto uiPointsObject = std::make_unique<dae::GameObject>();
 	uiPointsObject->AddComponent<dae::RenderComponent>();
 	auto pointsText = uiPointsObject->AddComponent<dae::TextComponent>("Points", m_pFont);
-	uiPointsObject->SetLocalPosition(glm::vec3(20, 200, 0));
+	if (isSecondPlayer)
+	{
+		uiPointsObject->SetLocalPosition(glm::vec3(450, 100, 0));
+	}
+	else
+	{
+		uiPointsObject->SetLocalPosition(glm::vec3(20, 100, 0));
+	}
 	scene.Add(std::move(uiPointsObject));
 
 	auto uiLivesObject = std::make_unique<dae::GameObject>();
 	auto healthComponent = uiLivesObject->AddComponent<dae::HealthComponent>();
 	uiLivesObject->AddComponent<dae::HealthDisplayComponent>();
-	uiLivesObject->SetLocalPosition(glm::vec3(20, 130, 0));
+	if (isSecondPlayer)
+	{
+		uiLivesObject->SetLocalPosition(glm::vec3(600, 130, 0));
+	}
+	else
+	{
+		uiLivesObject->SetLocalPosition(glm::vec3(20, 130, 0));
+	}
 	scene.Add(std::move(uiLivesObject));
 
 	//Qbert
@@ -212,24 +300,47 @@ void dae::GameManager::MakeQbert(LevelComponent* pLevel, Scene& scene)
 	auto pQbert = scene.Add(std::move(qbert));
 
 	//ScoreComponent
-	pQbert->AddComponent<dae::ScoreComponent>();
+	int startPoints = m_amountOfPointsPlayer1;
+	if (isSecondPlayer)
+	{
+		startPoints = m_amountOfPointsPlayer2;
+	}
+	pQbert->AddComponent<dae::ScoreComponent>(startPoints);
 	pQbert->AddComponent<dae::ScoreDisplayComponent>(pointsText);
 
 	//QbertComponent
-	pQbert->AddComponent<dae::QbertComponent>(healthComponent,pLevel);
+	pQbert->AddComponent<dae::QbertComponent>(healthComponent,pLevel, gridPos,isSecondPlayer);
 
 	//Qbert Commands
-	auto upLeftQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(1, 1));
-	dae::InputManager::GetInstance().BindCommand(SDLK_w, std::move(upLeftQbertCommand), true);
+	if (!isSecondPlayer)
+	{
+		auto upLeftQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(1, 1));
+		dae::InputManager::GetInstance().BindCommand(SDLK_w, std::move(upLeftQbertCommand), true);
 
-	auto upRightQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(-1, 1));
-	dae::InputManager::GetInstance().BindCommand(SDLK_a, std::move(upRightQbertCommand), true);
+		auto upRightQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(-1, 1));
+		dae::InputManager::GetInstance().BindCommand(SDLK_a, std::move(upRightQbertCommand), true);
 
-	auto downLeftQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(-1, -1));
-	dae::InputManager::GetInstance().BindCommand(SDLK_s, std::move(downLeftQbertCommand), true);
+		auto downLeftQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(-1, -1));
+		dae::InputManager::GetInstance().BindCommand(SDLK_s, std::move(downLeftQbertCommand), true);
 
-	auto downRightQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(1, -1));
-	dae::InputManager::GetInstance().BindCommand(SDLK_d, std::move(downRightQbertCommand), true);
+		auto downRightQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(1, -1));
+		dae::InputManager::GetInstance().BindCommand(SDLK_d, std::move(downRightQbertCommand), true);
+	}
+	else if (isSecondPlayer || m_currentGameMode == GameMode::SinglePlayer)
+	{
+		auto upLeftQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(1, 1));
+		dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::DPadUp, std::move(upLeftQbertCommand), true);
+
+		auto upRightQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(-1, 1));
+		dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::DPadRight, std::move(upRightQbertCommand), true);
+
+		auto downLeftQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(-1, -1));
+		dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::DPadDown, std::move(downLeftQbertCommand), true);
+
+		auto downRightQbertCommand = std::make_unique<dae::MovePlayerCommand>(pQbert, glm::vec2(1, -1));
+		dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::DPadLeft, std::move(downRightQbertCommand), true);
+	}
+	
 }
 
 void dae::GameManager::MakeSpawns(LevelComponent* pLevel, Scene& scene)
@@ -268,4 +379,29 @@ void dae::GameManager::MakeDisks(LevelComponent* pLevel, Scene& scene)
 	disk = std::make_unique<dae::GameObject>();
 	disk->AddComponent<dae::DiskComponent>(pLevel, false, randomRow);
 	scene.Add(std::move(disk));
+}
+
+void dae::GameManager::MakeCoily(LevelComponent* pLevel, Scene& scene)
+{
+	//Adding Playable Coily 
+	auto coily = std::make_unique<dae::GameObject>();
+	coily->AddComponent<dae::CoilyComponent>(pLevel);
+	auto pCoily = scene.Add(std::move(coily));
+
+	//Coily Commands
+	auto upLeftCoilyCommand = std::make_unique<dae::MoveCoilyCommand>(pCoily, glm::vec2(1, 1));
+	m_pCoilyCommands.emplace_back(upLeftCoilyCommand.get());
+	dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::DPadUp, std::move(upLeftCoilyCommand), true);
+
+	auto upRightCoilyCommand = std::make_unique<dae::MoveCoilyCommand>(pCoily, glm::vec2(-1, 1));
+	m_pCoilyCommands.emplace_back(upRightCoilyCommand.get());
+	dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::DPadLeft, std::move(upRightCoilyCommand), true);
+
+	auto downLeftCoilyCommand = std::make_unique<dae::MoveCoilyCommand>(pCoily, glm::vec2(-1, -1));
+	m_pCoilyCommands.emplace_back(downLeftCoilyCommand.get());
+	dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::DPadDown, std::move(downLeftCoilyCommand), true);
+
+	auto downRightCoilyCommand = std::make_unique<dae::MoveCoilyCommand>(pCoily, glm::vec2(1, -1));
+	m_pCoilyCommands.emplace_back(downRightCoilyCommand.get());
+	dae::InputManager::GetInstance().BindCommand(Controller::ControllerButton::DPadRight, std::move(downRightCoilyCommand), true);
 }

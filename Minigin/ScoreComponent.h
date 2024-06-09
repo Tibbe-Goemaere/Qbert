@@ -9,7 +9,7 @@ namespace dae
 	class ScoreComponent final : public BaseComponent
 	{
 	public:
-		ScoreComponent(GameObject* pParent);
+		ScoreComponent(GameObject* pParent, const int m_startScore = 0);
 		virtual ~ScoreComponent() = default;
 		ScoreComponent(const ScoreComponent& other) = delete;
 		ScoreComponent(ScoreComponent&& other) = delete;

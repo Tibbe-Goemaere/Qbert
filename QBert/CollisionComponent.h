@@ -24,7 +24,7 @@ namespace dae
 
 	private:
 		LevelComponent* m_pLevel;
-		std::unique_ptr<Subject> m_pDiedEvent;
+		std::unique_ptr<Subject> m_pCollisionEvent;
 
 		void HandleCollisions(EntityType myType, EntityType otherType, dae::GameObject* pOtherObject);
 	};

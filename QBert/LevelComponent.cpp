@@ -8,6 +8,7 @@
 #include "TimeManager.h"
 #include "SceneManager.h"
 #include "GameManager.h"
+#include "CoilyComponent.h"
 
 dae::LevelComponent::LevelComponent(dae::GameObject* pParent, const std::string& levelPath)
 	:BaseComponent::BaseComponent(pParent)
@@ -76,7 +77,7 @@ bool dae::LevelComponent::ChangeBlock(int idx, int textureIdx, bool goBack)
 		m_pBlocks[idx]->textureIndex -= 1;
 		m_pRenderComponent->SetRenderTexture(false, idx + (textureIdx * amountOfBlocks));
 		m_pRenderComponent->SetRenderTexture(true, idx + ((textureIdx - 1) * amountOfBlocks));
-		return true;
+		return false;
 	}
 	return false;
 }
@@ -154,16 +155,41 @@ std::vector<dae::Entity*> dae::LevelComponent::LookForEntities(int entityIdx)
 	return m_pOtherEntitiesOnBlock;
 }
 
-void dae::LevelComponent::KillAllEnemies()
+void dae::LevelComponent::KillAllEnemies(bool saveCoily)
+{
+	if (m_levelInfo->gameMode == 2)
+	{
+		GameManager::GetInstance().RemoveCoilyCommands();
+	}
+	KillEntities(EntityType::GreenEnemy,saveCoily);
+	
+	KillEntities(EntityType::PurpleEnemy, saveCoily);
+}
+
+void dae::LevelComponent::KillEntities(EntityType eType, bool saveCoily)
 {
 	for (const auto& entity : m_pEntities)
 	{
-		if (entity->entityType != EntityType::Player)
+		if (entity->entityType == eType)
 		{
+			if (saveCoily)
+			{
+				if (entity->pObject->HasComponent<CoilyComponent>())
+				{
+					continue;
+				}
+			}
 			entity->pObject->MarkForDestroy();
 		}
 	}
-	m_pEntities.clear();
+
+	m_pEntities.erase(
+		std::remove_if(m_pEntities.begin(), m_pEntities.end(),
+			[eType](const auto& entity) {
+				return entity->pObject->MarkedForDestroy();
+			}),
+		m_pEntities.end()
+	);
 }
 
 void dae::LevelComponent::EnableEntity(int entityIdx)
@@ -194,6 +220,11 @@ dae::DiskComponent* dae::LevelComponent::GetDisk(int row, int column)
 		return *it;
 	}
 	return nullptr;
+}
+
+int dae::LevelComponent::GetAmountOfDisks() const
+{
+	return static_cast<int>(m_pDisks.size());
 }
 
 dae::XmlLevelInfo* dae::LevelComponent::GetLevelInfo()

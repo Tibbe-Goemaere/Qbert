@@ -18,7 +18,7 @@ namespace dae
 	public:
 		void Update() override;
 
-		QbertComponent(dae::GameObject* pParent, dae::HealthComponent* pHealthComponent, dae::LevelComponent* pLevel, float speed = 150.f);
+		QbertComponent(dae::GameObject* pParent, dae::HealthComponent* pHealthComponent, dae::LevelComponent* pLevel, const std::pair<int,int> gridPos, bool isPlayerTwo = false,float speed = 150.f);
 		virtual ~QbertComponent() = default;
 		QbertComponent(const QbertComponent& other) = delete;
 		QbertComponent(QbertComponent&& other) = delete;

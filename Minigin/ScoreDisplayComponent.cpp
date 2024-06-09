@@ -4,7 +4,7 @@
 #include "TextComponent.h"
 
 dae::ScoreDisplayComponent::ScoreDisplayComponent(GameObject* pObject, TextComponent* pText)
-	:m_pointsText{ "Score: " }
+	:m_pointsText{ "Score " }
 	,BaseComponent::BaseComponent(pObject)
 {
 	m_pTextComponent = pText;

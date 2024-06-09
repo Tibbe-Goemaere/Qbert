@@ -1,7 +1,5 @@
 #pragma once
 #include "BaseComponent.h"
-#include <string>
-#include "Observer.h"
 
 namespace dae
 {
@@ -9,7 +7,7 @@ namespace dae
 	class MoveComponent;
 	class CollisionComponent;
 
-	class SlickComponent final : public BaseComponent, public Observer
+	class SlickComponent final : public BaseComponent
 	{
 	public:
 		void Update();
@@ -21,7 +19,6 @@ namespace dae
 		SlickComponent& operator=(const SlickComponent& other) = delete;
 		SlickComponent& operator=(SlickComponent&& other) = delete;
 
-		void Notify(Event e, const GameObject* pObject) override;
 	private:
 		float m_timer;
 		const float m_waitTime;

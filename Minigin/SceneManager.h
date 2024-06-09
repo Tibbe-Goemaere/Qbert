@@ -12,6 +12,7 @@ namespace dae
 	public:
 		Scene& CreateScene(const std::string& name);
 		void PickScene(const std::string& name);
+		Scene& GetCurrentScene() const;
 
 		void Update();
 		void LateUpdate();

@@ -11,8 +11,9 @@
 #include "HealthDisplayComponent.h"
 #include "TimeManager.h"
 #include "UpdateManager.h"
+#include "GameManager.h"
 
-dae::QbertComponent::QbertComponent(dae::GameObject* pParent, dae::HealthComponent* pHealthComponent, LevelComponent* pLevel, float speed)
+dae::QbertComponent::QbertComponent(dae::GameObject* pParent, dae::HealthComponent* pHealthComponent, LevelComponent* pLevel, const std::pair<int, int> gridPos, bool isPlayerTwo, float speed)
 	:BaseComponent::BaseComponent(pParent)
 	,m_pScoreComponent{ pParent->GetComponent<ScoreComponent>() }
 	,m_pHealthComponent{pHealthComponent}
@@ -32,14 +33,22 @@ dae::QbertComponent::QbertComponent(dae::GameObject* pParent, dae::HealthCompone
 	m_pCollision->GetSubject()->AddObserver(this);
 
 	m_pRenderQbert = m_pParent->AddComponent<dae::RenderComponent>();
-	m_pRenderQbert->SetTexture("Sprites/Qbert.png");
+	if (isPlayerTwo)
+	{
+		m_pRenderQbert->SetTexture("Sprites/Qbert2.png");
+	}
+	else
+	{
+		m_pRenderQbert->SetTexture("Sprites/Qbert.png");
+	}
+	
 	const glm::vec2 curseOffset{-10.f,-45.f};
 	m_pRenderQbert->SetTexture("Sprites/Curse.png", false, curseOffset);
 
 	m_pMovecomponent = pParent->GetComponent<MoveComponent>();
 	if (m_pMovecomponent == nullptr)
 	{
-		m_pMovecomponent = pParent->AddComponent<MoveComponent>(pLevel, EntityType::Player, 0, 0, speed);
+		m_pMovecomponent = pParent->AddComponent<MoveComponent>(pLevel, EntityType::Player, gridPos.first, gridPos.second, speed);
 	}
 }
 
@@ -88,6 +97,17 @@ void dae::QbertComponent::Notify(Event e, const GameObject* )
 	case dae::Event::PlayerDies:
 		Die();
 		break;
+	case dae::Event::CoilyDied:
+	{
+		const int coilyScoreAmount = 500;
+		m_pScoreComponent->AddScore(coilyScoreAmount);
+	}
+		break;
+	case dae::Event::CaughtSlick:
+	{
+		const int slickScoreAmount = 300;
+		m_pScoreComponent->AddScore(slickScoreAmount);
+	}
 	default:
 		break;
 	}
@@ -104,7 +124,6 @@ void dae::QbertComponent::Die()
 	m_pRenderQbert->SetRenderTexture(true, 1);
 	m_isDead = true;
 	m_pMovecomponent->GetLevel()->KillAllEnemies();
-	
 }
 
 void dae::QbertComponent::Respawn()
@@ -117,6 +136,11 @@ void dae::QbertComponent::Respawn()
 	if (m_pMovecomponent->GetCurrentState() == MovementState::Falling)
 	{
 		m_pMovecomponent->ResetPosition();
+	}
+
+	if (m_pMovecomponent->GetLevel()->GetLevelInfo()->gameMode == static_cast<int>(GameMode::Versus))
+	{
+		GameManager::GetInstance().MakeCoilyPlayer(m_pMovecomponent->GetLevel());
 	}
 }
 
@@ -142,6 +166,7 @@ void dae::QbertComponent::Update()
 		{
 			m_pParent->SetParent(m_pDisk->GetParent(), true);
 			m_pDisk->Activate();
+			m_pMovecomponent->GetLevel()->KillAllEnemies(true);
 		}
 		else
 		{
@@ -167,7 +192,9 @@ void dae::QbertComponent::Update()
 				m_pCollision->CheckCollision(m_pMovecomponent->GetEntityIdx());
 				if (m_pMovecomponent->GetLevel()->CheckWin())
 				{
-
+					const int diskPoints = 50;
+					m_pScoreComponent->AddScore(diskPoints * m_pMovecomponent->GetLevel()->GetAmountOfDisks());
+					GameManager::GetInstance().SetAmountOfPoints(m_pScoreComponent->GetScore());
 				}
 			}
 		}

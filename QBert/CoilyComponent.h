@@ -27,6 +27,7 @@ namespace dae
 		GameObject* GetParent() const;
 		void Notify(Event e, const GameObject* pObject) override;
 		void CheckCollision();
+		void MoveCoily(const glm::vec2 direction);
 	private:
 		dae::MoveComponent* m_pMoveComponent;
 		dae::RenderComponent* m_pRenderComponent;

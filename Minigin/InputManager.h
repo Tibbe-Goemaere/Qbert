@@ -35,6 +35,7 @@ namespace dae
 		void BindCommand(Controller::ControllerButton key, std::unique_ptr<Command> pCommand, bool executeOncePerClick = false, int idx = 0);
 
 		void UnregisterCommands();
+		void UnregisterCommand(Command* pCommand);
 	private:
 		std::vector<KeyboardCommandPair> m_KeyboardCommands;
 		std::vector<ControllerCommandPair> m_ControllerCommands;

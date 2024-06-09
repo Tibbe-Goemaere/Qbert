@@ -98,14 +98,13 @@ namespace dae
 	template<typename T>
 	inline bool GameObject::HasComponent()
 	{
-		for (const auto& component : m_pComponents)
+		auto pComp = this->GetComponent<T>();
+		if (pComp == nullptr)
 		{
-			if (typeid(component) == typeid(T))
-			{
-				return true;
-			}
+			return false;
 		}
-		return false;
+		return true;
+		
 	}
 
 	template<typename T>

@@ -46,7 +46,7 @@ void dae::DiskComponent::Update()
 		auto newPos = m_pParent->GetLocalPosition() + m_direction * m_speed * dae::TimeManager::GetInstance().GetDeltaTime();
 		m_pParent->SetLocalPosition(newPos);
 
-		float margin = 1.f;
+		float margin = 2.f;
 
 		if (glm::distance(newPos,m_targetPosition) <= margin)
 		{

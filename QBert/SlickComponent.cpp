@@ -5,6 +5,7 @@
 #include "MoveComponent.h"
 #include "RenderComponent.h"
 #include "CollisionComponent.h"
+#include "Observer.h"
 
 dae::SlickComponent::SlickComponent(dae::GameObject* pParent, dae::LevelComponent* pLevel)
 	:BaseComponent::BaseComponent(pParent)
@@ -35,20 +36,7 @@ dae::SlickComponent::SlickComponent(dae::GameObject* pParent, dae::LevelComponen
 	{
 		m_pCollision = pParent->AddComponent<CollisionComponent>(pLevel);
 	}
-	m_pCollision->GetSubject()->AddObserver(this);
 }
-
-void dae::SlickComponent::Notify(dae::Event e, const GameObject*)
-{
-	switch (e)
-	{
-	case dae::Event::PlayerDies:
-		break;
-	default:
-		break;
-	}
-}
-
 
 
 void dae::SlickComponent::Update()

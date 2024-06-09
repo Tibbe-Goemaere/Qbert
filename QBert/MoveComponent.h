@@ -51,6 +51,9 @@ namespace dae
 		dae::LevelComponent* m_pLevel;
 		dae::Block* m_pCurrentBlock;
 
+		const float m_dropTime;
+		float m_dropTimer;
+
 		void Fall();
 		void Drop();
 	};
